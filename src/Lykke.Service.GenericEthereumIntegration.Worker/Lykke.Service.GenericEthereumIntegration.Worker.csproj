@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <Version>1.0.0</Version>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <LangVersion>7.1</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <LangVersion>7.1</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="SystemConfig.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="SystemConfig.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Akka" Version="1.3.5" />
+    <PackageReference Include="Akka.DI.AutoFac" Version="1.3.0" />
+    <PackageReference Include="Autofac" Version="4.6.2" />
+    <PackageReference Include="JetBrains.Annotations" Version="11.1.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.2.1" />
+    <PackageReference Include="MessagePack" Version="1.7.3.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Lykke.Service.GenericEthereumIntegration.Worker.Core\Lykke.Service.GenericEthereumIntegration.Worker.Core.csproj" />
+    <ProjectReference Include="..\Lykke.Service.GenericEthereumIntegration.Worker.Log\Lykke.Service.GenericEthereumIntegration.Worker.Log.csproj" />
+    <ProjectReference Include="..\Lykke.Service.GenericEthereumIntegration.Worker.Repositories\Lykke.Service.GenericEthereumIntegration.Worker.Repositories.csproj" />
+    <ProjectReference Include="..\Lykke.Service.GenericEthereumIntegration.Worker.Services\Lykke.Service.GenericEthereumIntegration.Worker.Services.csproj" />
+    <ProjectReference Include="..\Lykke.Service.GenericEthereumIntegration.Common\Lykke.Service.GenericEthereumIntegration.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Dockerfile">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Utils\" />
+  </ItemGroup>
+
+</Project>

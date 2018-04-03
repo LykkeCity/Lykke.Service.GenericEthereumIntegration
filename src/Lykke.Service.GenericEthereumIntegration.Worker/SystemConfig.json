@@ -1,0 +1,7 @@
+﻿{
+  "akka": {
+    "loggers": [
+      "Lykke.Service.GenericEthereumIntegration.Worker.Log.LykkeLogger, Lykke.Service.GenericEthereumIntegration.Worker.Log"
+    ]
+  }
+}
