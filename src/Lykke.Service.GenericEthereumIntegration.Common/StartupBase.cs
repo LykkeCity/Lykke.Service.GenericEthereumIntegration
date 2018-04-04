@@ -8,6 +8,7 @@ using JetBrains.Annotations;
 using Lykke.Common.ApiLibrary.Middleware;
 using Lykke.Common.ApiLibrary.Swagger;
 using Lykke.Logs;
+using Lykke.Logs.Slack;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Services.Interfaces;
 using Lykke.SettingsReader;
 using Lykke.SlackNotification.AzureQueue;
@@ -311,6 +312,24 @@ namespace Lykke.Service.GenericEthereumIntegration.Common
             azureStorageLogger.Start();
 
             aggregateLogger.AddLog(azureStorageLogger);
+
+            var allMessagesSlackLogger = LykkeLogToSlack.Create
+            (
+                slackService,
+                "BlockChainIntegration",
+                LogLevel.All
+            );
+
+            aggregateLogger.AddLog(allMessagesSlackLogger);
+
+            var importantMessagesSlackLogger = LykkeLogToSlack.Create
+            (
+                slackService,
+                "BlockChainIntegrationImportantMessages",
+                LogLevel.All ^ LogLevel.Info
+            );
+
+            aggregateLogger.AddLog(importantMessagesSlackLogger);
 
             return aggregateLogger;
         }
