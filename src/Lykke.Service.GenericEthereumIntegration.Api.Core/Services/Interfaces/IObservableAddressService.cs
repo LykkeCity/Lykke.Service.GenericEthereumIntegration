@@ -1,15 +1,16 @@
 ﻿using System.Threading.Tasks;
+using JetBrains.Annotations;
 
 namespace Lykke.Service.GenericEthereumIntegration.Api.Core.Services.Interfaces
 {
     public interface IObservableAddressService
     {
-        Task AddToIncomingObservationListAsync(string address);
+        Task AddToIncomingObservationListAsync([NotNull] string address);
 
-        Task AddToOutgoingObservationListAsync(string address);
+        Task AddToOutgoingObservationListAsync([NotNull] string address);
 
-        Task DeleteFromIncomingObservationListAsync(string address);
+        Task DeleteFromIncomingObservationListAsync([NotNull] string address);
 
-        Task DeleteFromOutgoingObservationListAsync(string address);
+        Task DeleteFromOutgoingObservationListAsync([NotNull] string address);
     }
 }

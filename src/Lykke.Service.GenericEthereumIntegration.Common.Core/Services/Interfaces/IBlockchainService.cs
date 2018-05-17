@@ -83,18 +83,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Core.Services.Interfac
         ///    The data at given address as a hex string (or 0x for wallets).
         /// </returns>
         Task<string> GetCodeAsync(string address);
-
-        /// <summary>
-        ///     Get the balance of a public address at a latest block.
-        /// </summary>
-        /// <param name="address">
-        ///     The address to get the balance of.
-        /// </param>
-        /// <returns>
-        ///     A BigInteger instance of the current balance for the given address in wei.
-        /// </returns>
-        Task<BigInteger> GetLatestBalanceAsync(string address);
-
+        
         /// <summary>
         ///     Returns the current block number.
         /// </summary>
@@ -113,18 +102,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Core.Services.Interfac
         ///     A BigInteger instance of the next nonce for the given address.
         /// </returns>
         Task<BigInteger> GetNextNonceAsync(string address);
-
-        /// <summary>
-        ///     Get the balance of a public address at a pending block.
-        /// </summary>
-        /// <param name="address">
-        ///     The address to get the balance of.
-        /// </param>
-        /// <returns>
-        ///     A BigInteger instance of the current balance for the given address in wei.
-        /// </returns>
-        Task<BigInteger> GetPendingBalanceAsync(string address);
-
+        
         /// <summary>
         ///    Get the timestamp of a specified block.
         /// </summary>

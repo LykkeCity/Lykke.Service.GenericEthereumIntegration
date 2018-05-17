@@ -1,12 +1,14 @@
 ﻿using JetBrains.Annotations;
+using Lykke.Service.BlockchainApi.Contract.Wallets;
+using Lykke.Service.GenericEthereumIntegration.Common.Controllers;
 using Lykke.Service.GenericEthereumIntegration.SignApi.Core.Services.Interfaces;
-using Lykke.Service.GenericEthereumIntegration.SignApi.Models;
 using Microsoft.AspNetCore.Mvc;
+
 
 namespace Lykke.Service.GenericEthereumIntegration.SignApi.Controllers
 {
     [PublicAPI, Route("api/wallets")]
-    public class WalletsController : Controller
+    public class WalletsController : IntegrationControllerBase
     {
         private readonly IWalletService _walletService;
 
@@ -22,7 +24,7 @@ namespace Lykke.Service.GenericEthereumIntegration.SignApi.Controllers
         {
             var wallet = _walletService.CreateWallet();
 
-            return Ok(new CreateWalletResponse
+            return Ok(new WalletResponse
             {
                 PrivateKey = wallet.PrivateKey,
                 PublicAddress = wallet.PublicAddress

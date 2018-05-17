@@ -2,6 +2,7 @@
 
 namespace Lykke.Service.GenericEthereumIntegration.SignApi.Core.Settings.Service
 {
+    [UsedImplicitly]
     public class GenericEthereumIntegrationSignApiSettings
     {
         [UsedImplicitly(ImplicitUseKindFlags.Assign)]

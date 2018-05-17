@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Lykke.Service.GenericEthereumIntegration.Api.Models
 {
+    [UsedImplicitly]
     public class PaginationRequest
     {
         public PaginationRequest()

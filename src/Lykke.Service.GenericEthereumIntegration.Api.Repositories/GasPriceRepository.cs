@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 using System.Threading.Tasks;
 using AzureStorage;
 using Lykke.Service.GenericEthereumIntegration.Api.Core.Repositories.Interfaces;
@@ -32,6 +33,11 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Repositories
 
         public async Task<(BigInteger Min, BigInteger Max)> GetOrAddAsync(BigInteger min, BigInteger max)
         {
+            if (min > max)
+            {
+                throw new ArgumentException($"Should be lower or equal to {nameof(max)}.", nameof(min));
+            }
+            
             var partitionKey = GetPartitionKey();
             var rowKey = GetRowKey();
 

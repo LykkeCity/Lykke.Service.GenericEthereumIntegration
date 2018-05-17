@@ -1,7 +1,10 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
+using Lykke.Service.GenericEthereumIntegration.Common.Core.Settings;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.PlatformAbstractions;
+
 
 namespace Lykke.Service.GenericEthereumIntegration.Common
 {
@@ -11,7 +14,22 @@ namespace Lykke.Service.GenericEthereumIntegration.Common
             => Environment.GetEnvironmentVariable("ENV_INFO");
 
 
-        protected static async Task RunAsync(Func<IWebHostBuilder, IWebHostBuilder> configureWebHost)
+        protected static Task RunAsync<TStartup, TSettings>()
+            where TStartup : StartupBase<TSettings>
+            where TSettings : AppSettingsBase
+        {
+            return RunAsync
+            (
+                builder => builder
+                    .UseKestrel()
+                    .UseUrls("http://*:5000")
+                    .UseContentRoot(Directory.GetCurrentDirectory())
+                    .UseStartup<TStartup>()
+                    .UseApplicationInsights()
+            );
+        }
+
+        private static async Task RunAsync(Func<IWebHostBuilder, IWebHostBuilder> configureWebHost)
         {
             Console.WriteLine($"{PlatformServices.Default.Application.ApplicationName} version {PlatformServices.Default.Application.ApplicationVersion}");
 

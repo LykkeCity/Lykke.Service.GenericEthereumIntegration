@@ -1,8 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Lykke.Service.GenericEthereumIntegration.Api.Core.Exceptions;
 using Lykke.Service.GenericEthereumIntegration.Api.Core.Services.Interfaces;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Repositories.Interfaces;
+using Lykke.Service.GenericEthereumIntegration.Common.Core.Utils;
 
 namespace Lykke.Service.GenericEthereumIntegration.Api.Services
 {
@@ -21,6 +23,8 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
 
         public async Task AddToIncomingObservationListAsync(string address)
         {
+            await ValidateInputParameterAsync(address);
+            
             if (await _observableAddressRepository.TryAddToIncomingObservationListAsync(address))
             {
                 return;
@@ -31,6 +35,8 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
 
         public async Task AddToOutgoingObservationListAsync(string address)
         {
+            await ValidateInputParameterAsync(address);
+            
             if (await _observableAddressRepository.TryAddToOutgoingObservationListAsync(address))
             {
                 return;
@@ -41,6 +47,8 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
 
         public async Task DeleteFromIncomingObservationListAsync(string address)
         {
+            await ValidateInputParameterAsync(address);
+            
             if (await _observableAddressRepository.TryDeleteFromIncomingObservationListAsync(address))
             {
                 return;
@@ -51,12 +59,27 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
 
         public async Task DeleteFromOutgoingObservationListAsync(string address)
         {
+            await ValidateInputParameterAsync(address);
+            
             if (await _observableAddressRepository.TryDeleteFromOutgoingObservationListAsync(address))
             {
                 return;
             }
 
             throw new ConflictException($"Specified address [{address}] has already bbeen added to the outgoing observation list.");
+        }
+
+        private async Task ValidateInputParameterAsync(string address)
+        {
+            if (string.IsNullOrEmpty(address))
+            {
+                throw new ArgumentException("Should not be null or empty.", nameof(address));
+            }
+
+            if (await AddressValidator.ValidateAsync(address))
+            {
+                throw new ArgumentException("Should be a valid address.", nameof(address));
+            }
         }
     }
 }

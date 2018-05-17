@@ -1,12 +1,15 @@
 ﻿using System.Collections.Generic;
+using JetBrains.Annotations;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Services.DTOs;
 
 namespace Lykke.Service.GenericEthereumIntegration.Api.Core.Services.Interfaces
 {
     public interface IAssetService
     {
-        AssetDto GetAsset(string assetId);
+        [NotNull]
+        AssetDto GetAsset([NotNull] string assetId);
 
+        [NotNull]
         IEnumerable<AssetDto> GetAssets();
     }
 }

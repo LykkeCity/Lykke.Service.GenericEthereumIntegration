@@ -4,11 +4,8 @@ using Lykke.Service.GenericEthereumIntegration.Common.Core.Settings.Service;
 
 namespace Lykke.Service.GenericEthereumIntegration.Api.Core.Settings.Service
 {
-    public class GenericEthereumIntegrationApiSettings
+    public class ApiSettings
     {
-        [UsedImplicitly(ImplicitUseKindFlags.Assign)]
-        public AssetSettings Asset { get; set; }
-
         [UsedImplicitly(ImplicitUseKindFlags.Assign)]
         public ChaosSettings Chaos { get; set; }
 
@@ -23,8 +20,5 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Core.Settings.Service
 
         [UsedImplicitly(ImplicitUseKindFlags.Assign)]
         public string GasAmount { get; set; }
-
-        [UsedImplicitly(ImplicitUseKindFlags.Assign)]
-        public RpcNodeSettings RpcNode { get; set; }
     }
 }

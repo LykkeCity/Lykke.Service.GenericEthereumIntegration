@@ -4,6 +4,7 @@ using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Services.DTOs;
+using Lykke.Service.GenericEthereumIntegration.Common.Services.Models.Parity;
 using Nethereum.Hex.HexTypes;
 using Nethereum.JsonRpc.Client;
 using Nethereum.Parity;
@@ -33,15 +34,44 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Services
 
         public override async Task<IEnumerable<TransactionDto>> GetTransactionsAsync(BigInteger blockNumber)
         {
-            throw new NotImplementedException();
+            var blocks = _web3Parity.Eth.Blocks;
+            var block = await blocks.GetBlockWithTransactionsByNumber.SendRequestAsync(new HexBigInteger(blockNumber));
+
+            var transactions = new List<TransactionDto>();
+
+            foreach (var transaction in block.Transactions)
+            {
+                var transferActions = (await GetTransactionTracesAsync(transaction.TransactionHash))
+                    .Skip(1)
+                    // TODO: Ensure, that it is correct
+                    .Where(x => new HexBigInteger(x.Action.Value) != new BigInteger(0))
+                    .Where(x => x.Action.CallType == "call")
+                    .Select(x => x.Action)
+                    .Select(x => new TransactionDto
+                    {
+                        FromAddress = x.From,
+                        ToAddress = x.To,
+                        TransactionAmount = new HexBigInteger(x.Value).Value 
+                    });
+
+                
+            }
+
+            return transactions;
         }
 
         public override async Task<string> GetTransactionErrorAsync(string txHash)
         {
-            var request = new RpcRequest($"{Guid.NewGuid()}", "trace_transaction", txHash);
-            var response = await _web3Parity.Client.SendRequestAsync<JArray>(request);
+            var traces = await GetTransactionTracesAsync(txHash);
 
-            return response.Select(x => x["error"]?.ToString()).FirstOrDefault();
+            return traces.Select(x => x.Error).FirstOrDefault();
+        }
+
+        private async Task<IEnumerable<TransactionTrace>> GetTransactionTracesAsync(string txHash)
+        {
+            var request = new RpcRequest($"{Guid.NewGuid()}", "trace_transaction", txHash);
+
+            return await _web3Parity.Client.SendRequestAsync<IEnumerable<TransactionTrace>>(request);
         }
     }
 }

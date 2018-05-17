@@ -1,13 +1,14 @@
-﻿using System.Linq;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
+using Lykke.Service.BlockchainApi.Contract.Transactions;
+using Lykke.Service.GenericEthereumIntegration.Common.Validation;
+using Lykke.Service.GenericEthereumIntegration.Common.Controllers;
 using Lykke.Service.GenericEthereumIntegration.SignApi.Core.Services.Interfaces;
-using Lykke.Service.GenericEthereumIntegration.SignApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Lykke.Service.GenericEthereumIntegration.SignApi.Controllers
 {
     [PublicAPI, Route("api/sign")]
-    public class SignController : Controller
+    public class SignController : IntegrationControllerBase
     {
         private readonly ISignService _signService;
 
@@ -18,16 +19,16 @@ namespace Lykke.Service.GenericEthereumIntegration.SignApi.Controllers
         }
         
 
-        [HttpPost]
+        [HttpPost, ValidateModel]
         public IActionResult SignAsync([FromBody] SignTransactionRequest signRequest)
         {
             var signedTransactionRaw = _signService.SignTransaction
             (
-                signRequest.PrivateKeys?.FirstOrDefault(),
+                signRequest.PrivateKeys[0],
                 signRequest.TransactionContext
             );
 
-            return Ok(new SignTransactionResponse
+            return Ok(new SignedTransactionResponse
             {
                 SignedTransaction = signedTransactionRaw
             });

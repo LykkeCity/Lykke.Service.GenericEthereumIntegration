@@ -38,30 +38,9 @@ namespace Lykke.Service.GenericEthereumIntegration.Worker
         protected override IReloadingManager<string> DbLogConnectionStringManager
             => AppSettings.Nested(x => x.GenericEthereumIntegrationWorker.Db.LogsConnString);
 
-        protected override string ServiceName
-            => "GenericEthereumIntegrationWorker";
+        protected override string ServiceType
+            => "Worker";
 
-        protected override string SlackNotificationsAzureQueueConnectionString
-            => AppSettings.CurrentValue.SlackNotifications.AzureQueue.ConnectionString;
-
-        protected override string SlackNotificationsAzureQueueName
-            => AppSettings.CurrentValue.SlackNotifications.AzureQueue.QueueName;
-
-
-        protected override void ConfigureApp(IApplicationBuilder app)
-        {
-            
-        }
-
-        protected override void ConfigureMvc(IMvcBuilder builder)
-        {
-            
-        }
-
-        protected override void ConfigureMvcOptions(MvcOptions options)
-        {
-            
-        }
 
         protected override Task OnStartApplication()
         {
@@ -111,27 +90,12 @@ namespace Lykke.Service.GenericEthereumIntegration.Worker
             await coordinatedShtudown.Run();
         }
 
-        protected override void PostBuildContainer(IContainer container)
-        {
-            
-        }
-
-        protected override void PostConfigureServices(IServiceCollection services)
-        {
-
-        }
-
         protected override void PreBuildContainer(ContainerBuilder containerBuilder)
         {
             containerBuilder
                 .RegisterModule(new GenericEthereumIntegrationWorkerModule(AppSettings.CurrentValue.GenericEthereumIntegrationWorker))
                 .RegisterModule<CoreModule>()
                 .RegisterModule<ServicesModule>();
-        }
-
-        protected override void PreConfigureServices(IServiceCollection services)
-        {
-
         }
     }
 }

@@ -2,13 +2,14 @@
 using JetBrains.Annotations;
 using Lykke.Service.BlockchainApi.Contract.Addresses;
 using Lykke.Service.GenericEthereumIntegration.Api.Core.Services.Interfaces;
+using Lykke.Service.GenericEthereumIntegration.Common.Controllers;
 using Microsoft.AspNetCore.Mvc;
 
 
 namespace Lykke.Service.GenericEthereumIntegration.Api.Controllers
 {
     [PublicAPI, Route("/api/addresses")]
-    public class AddressesController : ControllerBase
+    public class AddressesController : IntegrationControllerBase
     {
         private readonly IAddressValidationService _addressValidationService;
 

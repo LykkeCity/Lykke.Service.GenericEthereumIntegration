@@ -28,7 +28,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
         public TransactionService(
             IBlockchainService blockchainService,
             IGasPriceOracleService gasPriceOracleService,
-            GenericEthereumIntegrationApiSettings settings,
+            ApiSettings settings,
             ITransactionRepository transactionRepository,
             IChaosKitty chaosKitty)
         {
@@ -42,6 +42,15 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
 
         public async Task<string> BroadcastTransactionAsync(Guid operationId, string signedTxData)
         {
+            #region Validation
+            
+            if (string.IsNullOrEmpty(signedTxData))
+            {
+                throw new ArgumentException("Should not be null or empty.", nameof(signedTxData));
+            }
+            
+            #endregion
+            
             var operationTransactions = (await _transactionRepository.GetAllForOperationAsync(operationId)).ToList();
 
             if (operationTransactions.Any(x => x.SignedTxData == signedTxData && x.State != TransactionState.InProgress))
@@ -90,17 +99,27 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
 
             if (amount <= 0)
             {
-                throw new ArgumentException("Amount should be greater then zero.", nameof(amount));
+                throw new ArgumentException("Should be greater then zero.", nameof(amount));
+            }
+            
+            if (string.IsNullOrEmpty(fromAddress))
+            {
+                throw new ArgumentException("Should not be null or empty.", nameof(fromAddress));
             }
             
             if (!await AddressValidator.ValidateAsync(fromAddress))
             {
-                throw new ArgumentException("Address is invalid.", nameof(fromAddress));
+                throw new ArgumentException("Should be a valid address.", nameof(fromAddress));
             }
 
+            if (string.IsNullOrEmpty(toAddress))
+            {
+                throw new ArgumentException("Should not be null or empty.", nameof(toAddress));
+            }
+            
             if (!await AddressValidator.ValidateAsync(toAddress))
             {
-                throw new ArgumentException("Address is invalid.", nameof(toAddress));
+                throw new ArgumentException("Should be a valid address.", nameof(toAddress));
             }
 
             #endregion
@@ -214,7 +233,8 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
             return (gasPrice + 1) * gasAmount;
         }
 
-        public (BigInteger Amount, BigInteger Fee, BigInteger GasPrice) CalculateTransactionParams(TransactionAggregate transaction, decimal feeFactor)
+        [Pure]
+        private (BigInteger Amount, BigInteger Fee, BigInteger GasPrice) CalculateTransactionParams(TransactionAggregate transaction, decimal feeFactor)
         {
             var amount = transaction.Amount;
             var fee = transaction.Fee;
@@ -237,22 +257,9 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
             return (amount, fee, gasPrice);
         }
 
-        public async Task<(BigInteger Amount, BigInteger Fee, BigInteger GasPrice)> CalculateTransactionParamsAsync(BigInteger amount, bool includeFee, string toAddress)
+        [Pure]
+        private async Task<(BigInteger Amount, BigInteger Fee, BigInteger GasPrice)> CalculateTransactionParamsAsync(BigInteger amount, bool includeFee, string toAddress)
         {
-            #region Validation
-
-            if (amount <= 0)
-            {
-                throw new ArgumentException("Amount should be greater then zero.", nameof(amount));
-            }
-
-            if (!await AddressValidator.ValidateAsync(toAddress))
-            {
-                throw new ArgumentException("Address is invalid.", nameof(toAddress));
-            }
-
-            #endregion
-
             var gasPrice = await _gasPriceOracleService.CalculateGasPriceAsync(toAddress, amount);
             var fee = gasPrice * _gasAmount;
 
@@ -286,7 +293,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
             }
 
             #endregion
-
+            
             var operationTransactions = (await _transactionRepository.GetAllForOperationAsync(operationId)).ToList();
             var initialTransaction = operationTransactions.OrderBy(x => x.BuiltOn).FirstOrDefault();
 
@@ -295,7 +302,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
                 throw new NotFoundException($"Initial transaction for specified operation [{operationId}] has not been not found.");
             }
 
-            (var amount, var fee, var gasPrice) = CalculateTransactionParams(initialTransaction, feeFactor);
+            var (amount, fee, gasPrice) = CalculateTransactionParams(initialTransaction, feeFactor);
 
             var txData = _blockchainService.BuildTransaction
             (
@@ -339,7 +346,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
         /// <returns>
         ///     Transaction hash.
         /// </returns>
-        public async Task<string> SendRawTransactionOrGetTxHashAsync(string signedTxData)
+        private async Task<string> SendRawTransactionOrGetTxHashAsync(string signedTxData)
         {
             var txHash = _blockchainService.GetTransactionHash(signedTxData);
             var receipt = await _blockchainService.GetTransactionReceiptAsync(txHash);

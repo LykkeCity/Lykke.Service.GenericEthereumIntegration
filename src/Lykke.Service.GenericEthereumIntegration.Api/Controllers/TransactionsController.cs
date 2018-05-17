@@ -6,15 +6,16 @@ using Lykke.Service.BlockchainApi.Contract;
 using Lykke.Service.BlockchainApi.Contract.Transactions;
 using Lykke.Service.GenericEthereumIntegration.Api.Core.Services.Interfaces;
 using Lykke.Service.GenericEthereumIntegration.Api.Models;
-using Lykke.Service.GenericEthereumIntegration.Api.Validation;
+using Lykke.Service.GenericEthereumIntegration.Common.Controllers;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Domain;
+using Lykke.Service.GenericEthereumIntegration.Common.Validation;
 using Microsoft.AspNetCore.Mvc;
 
 
 namespace Lykke.Service.GenericEthereumIntegration.Api.Controllers
 {
     [PublicAPI, Route("api/transactions")]
-    public class TransactionsController : ControllerBase
+    public class TransactionsController : IntegrationControllerBase
     {
         private readonly ITransactionService _transactionService;
 

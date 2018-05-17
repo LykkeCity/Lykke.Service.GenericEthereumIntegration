@@ -1,8 +1,8 @@
 ﻿using System;
 using FluentValidation;
-using Lykke.Service.GenericEthereumIntegration.Api.Core.Settings.Service;
-using Lykke.Service.GenericEthereumIntegration.Common.Core.Settings.Service;
+using Lykke.Service.GenericEthereumIntegration.Common.Core.Settings.Integration;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Utils;
+
 
 namespace Lykke.Service.GenericEthereumIntegration.Api.Validation
 {
@@ -25,7 +25,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Validation
         public static void AssetMustBeSupported<T>(this IRuleBuilderInitial<T, string> ruleBuilder, AssetSettings assetSettings)
         {
             ruleBuilder
-                .Must(assetId => assetId == assetSettings.AssetId)
+                .Must(assetId => assetId == assetSettings.Id)
                 .WithMessage(x => $"Specified asset [{x}] is not supported.");
         }
     }

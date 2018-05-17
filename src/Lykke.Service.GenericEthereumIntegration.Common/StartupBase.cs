@@ -10,6 +10,7 @@ using Lykke.Common.ApiLibrary.Swagger;
 using Lykke.Logs;
 using Lykke.Logs.Slack;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Services.Interfaces;
+using Lykke.Service.GenericEthereumIntegration.Common.Core.Settings;
 using Lykke.SettingsReader;
 using Lykke.SlackNotification.AzureQueue;
 using Microsoft.AspNetCore.Builder;
@@ -22,7 +23,7 @@ using Newtonsoft.Json.Serialization;
 namespace Lykke.Service.GenericEthereumIntegration.Common
 {
     public abstract class StartupBase<T>
-        where T : class
+        where T : AppSettingsBase
     {
         // ReSharper disable MemberCanBePrivate.Global
         // ReSharper disable NotAccessedField.Global
@@ -41,36 +42,59 @@ namespace Lykke.Service.GenericEthereumIntegration.Common
         {
             Environment = env;
             AppSettings = CreateConfiguration(env).LoadSettings<T>();
+            IntegrationName = AppSettings.CurrentValue.Integration.Name;
         }
 
 
         // ReSharper disable UnusedParameter.Global
 
         protected abstract IReloadingManager<string> DbLogConnectionStringManager { get; }
+        
+        protected abstract string ServiceType { get; }
 
-        protected abstract string ServiceName { get; }
+        
+        protected virtual void ConfigureApp(IApplicationBuilder app)
+        {
+            
+        }
 
-        protected abstract string SlackNotificationsAzureQueueConnectionString { get; }
+        protected virtual void ConfigureMvc(IMvcBuilder builder)
+        {
+            
+        }
 
-        protected abstract string SlackNotificationsAzureQueueName { get; }
-        
-        protected abstract void ConfigureApp(IApplicationBuilder app);
-        
-        protected abstract void ConfigureMvc(IMvcBuilder builder);
+        protected virtual void ConfigureMvcOptions(MvcOptions options)
+        {
+            
+        }
 
-        protected abstract void ConfigureMvcOptions(MvcOptions options);
-        
-        protected abstract void PostBuildContainer(IContainer container);
-        
-        protected abstract void PostConfigureServices(IServiceCollection services);
-        
-        protected abstract void PreBuildContainer(ContainerBuilder containerBuilder);
-        
-        protected abstract void PreConfigureServices(IServiceCollection services);
+        protected virtual void PostBuildContainer(IContainer container)
+        {
+            
+        }
+
+        protected virtual void PostConfigureServices(IServiceCollection services)
+        {
+            
+        }
+
+        protected virtual void PreBuildContainer(ContainerBuilder containerBuilder)
+        {
+            
+        }
+
+        protected virtual void PreConfigureServices(IServiceCollection services)
+        {
+            
+        }
 
         // ReSharper restore UnusedParameter.Global
 
+        private string IntegrationName { get; }
 
+        private string ServiceName
+            => $"{IntegrationName}{ServiceType}";
+        
 
         [UsedImplicitly]
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, IApplicationLifetime appLifetime)
@@ -288,13 +312,16 @@ namespace Lykke.Service.GenericEthereumIntegration.Common
                 consoleLogger
             );
 
+
+            var slackNotificationSettings = AppSettings.CurrentValue.SlackNotifications.AzureQueue;
+
             // Creating slack notification service, which logs own azure queue processing messages to aggregate log
             var slackService = services.UseSlackNotificationsSenderViaAzureQueue
             (
                 new AzureQueueIntegration.AzureQueueSettings
                 {
-                    ConnectionString = SlackNotificationsAzureQueueConnectionString,
-                    QueueName = SlackNotificationsAzureQueueName
+                    ConnectionString = slackNotificationSettings.ConnectionString,
+                    QueueName = slackNotificationSettings.QueueName
                 }, 
                 aggregateLogger
             );

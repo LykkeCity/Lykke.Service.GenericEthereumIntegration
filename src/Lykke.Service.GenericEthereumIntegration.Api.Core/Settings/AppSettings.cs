@@ -1,16 +1,14 @@
 ﻿using JetBrains.Annotations;
 using Lykke.Service.GenericEthereumIntegration.Api.Core.Settings.Service;
-using Lykke.Service.GenericEthereumIntegration.Common.Core.Settings.SlackNotifications;
+using Lykke.Service.GenericEthereumIntegration.Common.Core.Settings;
+
 
 namespace Lykke.Service.GenericEthereumIntegration.Api.Core.Settings
 {
     [UsedImplicitly]
-    public class AppSettings
+    public class AppSettings : AppSettingsBase
     {
         [UsedImplicitly(ImplicitUseKindFlags.Assign)]
-        public GenericEthereumIntegrationApiSettings GenericEthereumIntegrationApi { get; set; }
-        
-        [UsedImplicitly(ImplicitUseKindFlags.Assign)]
-        public SlackNotificationsSettings SlackNotifications { get; set; }
+        public ApiSettings Api { get; set; }
     }
 }

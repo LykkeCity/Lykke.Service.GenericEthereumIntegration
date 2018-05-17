@@ -4,9 +4,8 @@ using JetBrains.Annotations;
 using Lykke.Service.BlockchainApi.Contract;
 using Lykke.Service.BlockchainApi.Contract.Balances;
 using Lykke.Service.GenericEthereumIntegration.Api.Core.Services.Interfaces;
-using Lykke.Service.GenericEthereumIntegration.Api.Filters;
 using Lykke.Service.GenericEthereumIntegration.Api.Models;
-using Lykke.Service.GenericEthereumIntegration.Api.Validation;
+using Lykke.Service.GenericEthereumIntegration.Common.Validation;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -44,7 +43,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Controllers
         [HttpGet, ValidateModel]
         public async Task<IActionResult> GetBalanceList(PaginationRequest request)
         {
-            (var balances, var assetId, var continuation) = await _observableBalanceService.GetBalancesAsync(request.Take, request.Continuation);
+            var (balances, assetId, continuation) = await _observableBalanceService.GetBalancesAsync(request.Take, request.Continuation);
 
             return Ok(new PaginationResponse<WalletBalanceContract>
             {

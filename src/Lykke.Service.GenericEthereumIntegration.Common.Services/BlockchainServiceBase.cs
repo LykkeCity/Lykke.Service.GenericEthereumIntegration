@@ -38,12 +38,11 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Services
         {
             var transaction = new Transaction
             (
-                to,
-                amount,
-                nonce,
-                gasPrice,
-                gasAmount,
-                null
+                to: to,
+                amount: amount,
+                nonce: nonce,
+                gasPrice: gasPrice,
+                gasLimit: gasAmount
             );
 
             return transaction.GetRLPEncoded().ToHex();
@@ -82,15 +81,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Services
         {
             return await _web3.Eth.GetCode.SendRequestAsync(address);
         }
-
-        /// <inheritdoc />
-        public async Task<BigInteger> GetLatestBalanceAsync(string address)
-        {
-            var block = BlockParameter.CreateLatest();
-
-            return await GetBalanceAsync(address, block);
-        }
-
+        
         /// <inheritdoc />
         public async Task<BigInteger> GetLatestBlockNumberAsync()
         {
@@ -99,16 +90,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Services
 
         /// <inheritdoc />
         public abstract Task<BigInteger> GetNextNonceAsync(string address);
-
-
-        /// <inheritdoc />
-        public async Task<BigInteger> GetPendingBalanceAsync(string address)
-        {
-            var block = BlockParameter.CreatePending();
-
-            return await GetBalanceAsync(address, block);
-        }
-
+        
         public async Task<BigInteger> GetTimestampAsync(BigInteger blockNumber)
         {
             var block = await _web3.Eth.Blocks.GetBlockWithTransactionsByNumber.SendRequestAsync(new HexBigInteger(blockNumber));

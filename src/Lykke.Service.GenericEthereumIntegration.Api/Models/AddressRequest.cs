@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using JetBrains.Annotations;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Lykke.Service.GenericEthereumIntegration.Api.Models
 {
+    [UsedImplicitly]
     public class AddressRequest
     {
-        [FromRoute]
+        [FromRoute, UsedImplicitly(ImplicitUseKindFlags.Assign)]
         public string Address { get; set; }
     }
 }

@@ -3,7 +3,7 @@ using Lykke.Common.Api.Contract.Responses;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace Lykke.Service.GenericEthereumIntegration.Api.Validation
+namespace Lykke.Service.GenericEthereumIntegration.Common.Validation
 {
     [AttributeUsage(AttributeTargets.Method)]
     public class ValidateModelAttribute : ActionFilterAttribute

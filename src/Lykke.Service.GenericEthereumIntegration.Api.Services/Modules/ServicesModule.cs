@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using Lykke.Service.GenericEthereumIntegration.Api.Core.Services.Interfaces;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Services.Interfaces;
+using Lykke.Service.GenericEthereumIntegration.Common.Core.Settings.Integration;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Settings.Service;
 using Lykke.Service.GenericEthereumIntegration.Common.Services.Factories;
 

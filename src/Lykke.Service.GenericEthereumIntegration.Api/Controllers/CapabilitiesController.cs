@@ -1,11 +1,13 @@
 ﻿using JetBrains.Annotations;
 using Lykke.Service.BlockchainApi.Contract.Common;
+using Lykke.Service.GenericEthereumIntegration.Common.Controllers;
 using Microsoft.AspNetCore.Mvc;
+
 
 namespace Lykke.Service.GenericEthereumIntegration.Api.Controllers
 {
     [PublicAPI, Route("api/capabilities")]
-    public class CapabilitiesController : ControllerBase
+    public class CapabilitiesController : IntegrationControllerBase
     {
         private static readonly CapabilitiesResponse CapabilitiesResponse;
 
@@ -15,6 +17,10 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Controllers
             {
                 AreManyInputsSupported = false,
                 AreManyOutputsSupported = false,
+                CanReturnExplorerUrl = false,
+                IsPublicAddressExtensionRequired = false,
+                IsReceiveTransactionRequired = false,
+                IsTestingTransfersSupported = false,
                 IsTransactionsRebuildingSupported = true
             };
         }

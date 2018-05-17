@@ -1,11 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Lykke.Service.GenericEthereumIntegration.Api.Core.Exceptions;
 using Lykke.Service.GenericEthereumIntegration.Api.Core.Services.Interfaces;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Repositories.DTOs;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Repositories.Interfaces;
-using Lykke.Service.GenericEthereumIntegration.Common.Core.Settings.Service;
+using Lykke.Service.GenericEthereumIntegration.Common.Core.Settings.Integration;
+using Lykke.Service.GenericEthereumIntegration.Common.Core.Utils;
 
 
 namespace Lykke.Service.GenericEthereumIntegration.Api.Services
@@ -28,6 +30,8 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
 
         public async Task BeginObservationAsync(string address)
         {
+            await ValidateInputParameterAsync(address);
+            
             if (await _observableBalanceRepository.TryAddAsync(address))
             {
                 return;
@@ -38,6 +42,8 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
 
         public async Task EndObservationAsync(string address)
         {
+            await ValidateInputParameterAsync(address);
+            
             if (await _observableBalanceRepository.DeleteIfExistsAsync(address))
             {
                 return;
@@ -48,11 +54,29 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
 
         public async Task<(IEnumerable<ObservableBalanceDto> balances, string assetId, string continuationToken)> GetBalancesAsync(int take, string continuationToken)
         {
+            if (take <= 0)
+            {
+                throw new ArgumentException("Should be greater than zero.", nameof(take));
+            }
+            
             IEnumerable<ObservableBalanceDto> balances;
 
             (balances, continuationToken) = await _observableBalanceRepository.GetAllWithNonZeroAmountAsync(take, continuationToken);
 
-            return (balances, _assetSettings.AssetId, continuationToken);
+            return (balances, _assetSettings.Id, continuationToken);
+        }
+        
+        private async Task ValidateInputParameterAsync(string address)
+        {
+            if (string.IsNullOrEmpty(address))
+            {
+                throw new ArgumentException("Should not be null or empty.", nameof(address));
+            }
+
+            if (await AddressValidator.ValidateAsync(address))
+            {
+                throw new ArgumentException("Should be a valid address.", nameof(address));
+            }
         }
     }
 }

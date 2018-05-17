@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using FluentValidation.AspNetCore;
 using JetBrains.Annotations;
 using Lykke.Service.GenericEthereumIntegration.SignApi.Core.Settings;
 using Lykke.Service.GenericEthereumIntegration.SignApi.Services.Modules;
@@ -23,50 +24,23 @@ namespace Lykke.Service.GenericEthereumIntegration.SignApi
         protected override IReloadingManager<string> DbLogConnectionStringManager
             => AppSettings.Nested(x => x.GenericEthereumIntegrationSignApi.Db.LogsConnString);
 
-        protected override string ServiceName
-            => "GenericEthereumIntegrationSignApi";
+        protected override string ServiceType
+            => "SignApi";
 
-        protected override string SlackNotificationsAzureQueueConnectionString
-            => AppSettings.CurrentValue.SlackNotifications.AzureQueue.ConnectionString;
-
-        protected override string SlackNotificationsAzureQueueName
-            => AppSettings.CurrentValue.SlackNotifications.AzureQueue.QueueName;
-
-
-        protected override void ConfigureApp(IApplicationBuilder app)
-        {
-
-        }
 
         protected override void ConfigureMvc(IMvcBuilder builder)
         {
-
+            builder
+                .AddFluentValidation(cfg =>
+                {
+                    cfg.RegisterValidatorsFromAssemblyContaining<Startup>();
+                });
         }
-
-        protected override void ConfigureMvcOptions(MvcOptions options)
-        {
-
-        }
-
-        protected override void PostBuildContainer(IContainer container)
-        {
-
-        }
-
-        protected override void PostConfigureServices(IServiceCollection services)
-        {
-
-        }
-
+        
         protected override void PreBuildContainer(ContainerBuilder containerBuilder)
         {
             containerBuilder
                 .RegisterModule<ServicesModule>();
-        }
-
-        protected override void PreConfigureServices(IServiceCollection services)
-        {
-
         }
     }
 }

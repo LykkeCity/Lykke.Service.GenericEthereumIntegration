@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Lykke.Service.GenericEthereumIntegration.Api.Controllers
+namespace Lykke.Service.GenericEthereumIntegration.Common.Controllers
 {
-    public abstract class ControllerBase : Controller
+    public abstract class IntegrationControllerBase : Controller
     {
         protected IActionResult NotImplemented()
         {

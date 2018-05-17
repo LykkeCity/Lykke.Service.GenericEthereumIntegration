@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using JetBrains.Annotations;
 using Lykke.Service.GenericEthereumIntegration.Api.Models;
-using Lykke.Service.GenericEthereumIntegration.Common.Core.Settings.Service;
+using Lykke.Service.GenericEthereumIntegration.Common.Core.Settings.Integration;
 
 
 namespace Lykke.Service.GenericEthereumIntegration.Api.Validation

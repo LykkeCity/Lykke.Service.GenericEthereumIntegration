@@ -28,7 +28,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Tests.Services
         {
             var blockchainService = new Mock<IBlockchainService>();
             var gasPriceRepository = new Mock<IGasPriceRepository>();
-            var settings = new GenericEthereumIntegrationApiSettings
+            var settings = new ApiSettings
             {
                 DefaultMaxGasPrice = MaxGasPrice,
                 DefaultMinGasPrice = MinGasPrice

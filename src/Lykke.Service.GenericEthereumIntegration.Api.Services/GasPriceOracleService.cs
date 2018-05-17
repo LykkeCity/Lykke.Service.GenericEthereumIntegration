@@ -1,9 +1,11 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 using System.Threading.Tasks;
 using Lykke.Service.GenericEthereumIntegration.Api.Core.Repositories.Interfaces;
 using Lykke.Service.GenericEthereumIntegration.Api.Core.Services.Interfaces;
 using Lykke.Service.GenericEthereumIntegration.Api.Core.Settings.Service;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Services.Interfaces;
+using Lykke.Service.GenericEthereumIntegration.Common.Core.Utils;
 
 namespace Lykke.Service.GenericEthereumIntegration.Api.Services
 {
@@ -18,7 +20,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
         public GasPriceOracleService(
             IBlockchainService blockchainService,
             IGasPriceRepository gasPriceRepository,
-            GenericEthereumIntegrationApiSettings settings)
+            ApiSettings settings)
         {
             _blockchainService = blockchainService;
             _defaultMaxGasPrice = BigInteger.Parse(settings.DefaultMaxGasPrice);
@@ -29,7 +31,22 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
 
         public async Task<BigInteger> CalculateGasPriceAsync(string to, BigInteger amount)
         {
-            (var minGasPrice, var maxGasPrice) = await _gasPriceRepository.GetOrAddAsync
+            if (string.IsNullOrEmpty(to))
+            {
+                throw new ArgumentException("Should not be null or empty.", nameof(to));
+            }
+
+            if (!AddressValidator.ValidateAsync(to).Result)
+            {
+                throw new ArgumentException("Should be a valid address.", nameof(to));
+            }
+
+            if (amount <= 0)
+            {
+                throw new ArgumentException("Should be greater than zero.", nameof(amount));
+            }
+            
+            var (minGasPrice, maxGasPrice) = await _gasPriceRepository.GetOrAddAsync
             (
                 min: _defaultMinGasPrice,
                 max: _defaultMaxGasPrice

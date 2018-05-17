@@ -1,6 +1,6 @@
 ﻿using System;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Services.Interfaces;
-using Lykke.Service.GenericEthereumIntegration.Common.Core.Settings.Service;
+using Lykke.Service.GenericEthereumIntegration.Common.Core.Settings.Integration;
 using Nethereum.Parity;
 
 namespace Lykke.Service.GenericEthereumIntegration.Common.Services.Factories
@@ -22,14 +22,14 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Services.Factories
 
         private IBlockchainService BuildParity()
         {
-            var web3Parity = new Web3Parity(_rpcNodeSettings.RpcNodeUrl);
+            var web3Parity = new Web3Parity(_rpcNodeSettings.Url);
 
             return new BlockchainServiceParity(web3Parity);
         }
 
         public IBlockchainService Build()
         {
-            var nodeType = _rpcNodeSettings.RpcNodeType;
+            var nodeType = _rpcNodeSettings.Type;
 
             switch (nodeType.ToLowerInvariant())
             {
