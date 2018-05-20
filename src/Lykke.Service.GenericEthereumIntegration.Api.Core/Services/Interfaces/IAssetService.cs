@@ -9,7 +9,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Core.Services.Interfaces
         [NotNull]
         AssetDto GetAsset([NotNull] string assetId);
 
-        [NotNull]
+        [NotNull, ItemNotNull]
         IEnumerable<AssetDto> GetAssets();
     }
 }

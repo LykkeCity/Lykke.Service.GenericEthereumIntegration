@@ -15,7 +15,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Worker.Repositories
     {
         private readonly IQueueExt _queue;
 
-        protected TaskRepositoryBase(
+        protected internal TaskRepositoryBase(
             IQueueExt queue)
         {
             ValidateGenericParameter();

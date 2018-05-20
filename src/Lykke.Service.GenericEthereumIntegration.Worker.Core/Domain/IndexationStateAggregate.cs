@@ -243,13 +243,13 @@ namespace Lykke.Service.GenericEthereumIntegration.Worker.Core.Domain
         public class Range
         {
             [Key(0)]
-            public bool Indexed { get; internal set; }
+            public bool Indexed { get; set; }
 
             [Key(1)]
-            public BigInteger Max { get; internal set; }
+            public BigInteger Max { get; set; }
 
             [Key(2)]
-            public BigInteger Min { get; internal set; }
+            public BigInteger Min { get; set; }
 
 
             public bool Contains(BigInteger blockNumber)

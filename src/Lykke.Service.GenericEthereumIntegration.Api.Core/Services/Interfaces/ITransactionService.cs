@@ -8,14 +8,17 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Core.Services.Interfaces
 {
     public interface ITransactionService
     {
+        [ItemNotNull]
         Task<string> BroadcastTransactionAsync(Guid operationId, [NotNull] string signedTxData);
 
         Task<string> BuildTransactionAsync(BigInteger amount, [NotNull] string fromAddress, bool includeFee, Guid operationId, [NotNull] string toAddress);
 
         Task DeleteTransactionStateAsync(Guid operationId);
 
+        [ItemNotNull]
         Task<TransactionAggregate> GetTransactionAsync(Guid operationId);
 
+        [ItemNotNull]
         Task<string> RebuildTransactionAsync(decimal feeFactor, Guid operationId);
     }
 }

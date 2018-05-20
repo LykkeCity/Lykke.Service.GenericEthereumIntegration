@@ -19,7 +19,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Worker.Repositories
         private readonly INoSQLTableStorage<IndexedBlockEntity> _table;
 
 
-        public IndexedBlockRepository(
+        internal IndexedBlockRepository(
             INoSQLTableStorage<IndexedBlockEntity> table)
         {
             _table = table;

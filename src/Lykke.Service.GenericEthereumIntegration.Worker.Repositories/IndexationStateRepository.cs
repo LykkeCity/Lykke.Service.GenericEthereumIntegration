@@ -19,7 +19,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Worker.Repositories
         private readonly IBlobStorage _blobStorage;
 
 
-        public IndexationStateRepository(
+        internal IndexationStateRepository(
             IBlobStorage blobStorage)
         {
             _blobStorage = blobStorage;

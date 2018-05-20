@@ -5,6 +5,7 @@ using AzureStorage.Queue;
 using AzureStorage.Tables;
 using AzureStorage.Tables.Templates.Index;
 using Common.Log;
+using JetBrains.Annotations;
 using Lykke.AzureStorage.Tables;
 using Lykke.AzureStorage.Tables.Entity.Metamodel;
 using Lykke.AzureStorage.Tables.Entity.Metamodel.Providers;
@@ -16,7 +17,7 @@ using Lykke.SettingsReader;
 
 namespace Lykke.Service.GenericEthereumIntegration.Common.Repositories.Factories
 {
-    public abstract class RepositoryFactoryBase
+    internal abstract class RepositoryFactoryBase
     {
         private const string HistoricalTransactionTable = "HistoricalTransactions";
         private const string HistoricalTransactionBlockIndexTable = "HistoricalTransactionsBlockIndex";
@@ -35,8 +36,8 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Repositories.Factories
 
 
         protected RepositoryFactoryBase(
-            IReloadingManager<string> connectionString,
-            ILog log)
+            [NotNull] IReloadingManager<string> connectionString,
+            [NotNull] ILog log)
         {
             _connectionString = connectionString;
             _log = log;
@@ -65,6 +66,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Repositories.Factories
             return AzureBlobStorage.Create(_connectionString);
         }
 
+        // ReSharper disable once MemberCanBePrivate.Global : Intended for future use
         protected INoSQLTableStorage<AzureIndex> CreateIndexTable(string indexTableName)
         {
             return AzureTableStorage<AzureIndex>.Create(_connectionString, indexTableName, _log);

@@ -8,7 +8,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Worker.Repositories
     [UsedImplicitly]
     public class BalanceObserverTaskRepository : TaskRepositoryBase<BalanceObserverTaskDto>, IBalanceObserverTaskRepository
     {
-        public BalanceObserverTaskRepository(IQueueExt queue) 
+        internal BalanceObserverTaskRepository(IQueueExt queue) 
             : base(queue)
         {
 

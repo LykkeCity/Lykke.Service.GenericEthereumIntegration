@@ -7,7 +7,7 @@ using Lykke.SettingsReader;
 
 namespace Lykke.Service.GenericEthereumIntegration.Worker.Repositories.Factories
 {
-    public class RepositoryFactory : RepositoryFactoryBase
+    internal class RepositoryFactory : RepositoryFactoryBase
     {
         private const string BalanceObserverTaskQueue = "BalanceObserverTasks";
         private const string IndexedBlockTable = "IndexedBlocks";

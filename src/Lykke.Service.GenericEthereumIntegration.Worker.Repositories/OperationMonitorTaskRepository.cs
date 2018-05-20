@@ -8,7 +8,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Worker.Repositories
     [UsedImplicitly]
     public class OperationMonitorTaskRepository : TaskRepositoryBase<OperationMonitorTaskDto>, IOperationMonitorTaskRepository
     {
-        public OperationMonitorTaskRepository(IQueueExt queue) 
+        internal OperationMonitorTaskRepository(IQueueExt queue) 
             : base(queue)
         {
         }

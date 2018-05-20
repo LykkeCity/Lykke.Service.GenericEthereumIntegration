@@ -16,6 +16,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Core.Exceptions
         public UnsupportedEdgeCaseException(string message, Exception inner)
             : base(message, inner)
         {
+            
         }
     }
 }

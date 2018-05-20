@@ -1,5 +1,8 @@
 ﻿using Autofac;
 using Common.Log;
+using JetBrains.Annotations;
+using Lykke.Service.GenericEthereumIntegration.Common.Core.Repositories.Interfaces;
+using Lykke.Service.GenericEthereumIntegration.Worker.Core.Repositories.Interfaces;
 using Lykke.Service.GenericEthereumIntegration.Worker.Repositories.Factories;
 using Lykke.SettingsReader;
 
@@ -12,8 +15,8 @@ namespace Lykke.Service.GenericEthereumIntegration.Worker.Repositories.Modules
 
 
         public RepositoriesModule(
-            IReloadingManager<string> connectionString,
-            ILog log)
+            [NotNull] IReloadingManager<string> connectionString,
+            [NotNull] ILog log)
         {
             _repositoryFactory = new RepositoryFactory(connectionString, log);
         }
@@ -22,42 +25,42 @@ namespace Lykke.Service.GenericEthereumIntegration.Worker.Repositories.Modules
         {
             builder
                 .Register(x => _repositoryFactory.BuildBalanceObserverTaskRepository())
-                .AsSelf()
+                .As<IBalanceObserverTaskRepository>()
                 .SingleInstance();
             
             builder
                 .Register(x => _repositoryFactory.BuildHistoricalTransactionRepository())
-                .AsSelf()
+                .As<IHistoricalTransactionRepository>()
                 .SingleInstance();
 
             builder
                 .Register(x => _repositoryFactory.BuildIndexationStateRepository())
-                .AsSelf()
+                .As<IIndexationStateRepository>()
                 .SingleInstance();
 
             builder
                 .Register(x => _repositoryFactory.BuildIndexedBlockRepository())
-                .AsSelf()
+                .As<IIndexedBlockRepository>()
                 .SingleInstance();
 
             builder
                 .Register(x => _repositoryFactory.BuildOperationMonitorTaskRepository())
-                .AsSelf()
+                .As<IOperationMonitorTaskRepository>()
                 .SingleInstance();
 
             builder
                 .Register(x => _repositoryFactory.BuildObservableAddressRepository())
-                .AsSelf()
+                .As<IObservableAddressRepository>()
                 .SingleInstance();
 
             builder
                 .Register(x => _repositoryFactory.BuildObservableBalanceRepository())
-                .AsSelf()
+                .As<IObservableBalanceRepository>()
                 .SingleInstance();
 
             builder
                 .Register(x => _repositoryFactory.BuildTransactionRepository())
-                .AsSelf()
+                .As<ITransactionRepository>()
                 .SingleInstance();
         }
     }

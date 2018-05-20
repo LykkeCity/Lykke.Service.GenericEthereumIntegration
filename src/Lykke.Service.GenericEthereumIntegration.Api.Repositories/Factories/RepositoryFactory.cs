@@ -1,4 +1,5 @@
 ﻿using Common.Log;
+using JetBrains.Annotations;
 using Lykke.Service.GenericEthereumIntegration.Api.Core.Repositories.Interfaces;
 using Lykke.Service.GenericEthereumIntegration.Api.Repositories.Entities;
 using Lykke.Service.GenericEthereumIntegration.Common.Repositories.Factories;
@@ -6,11 +7,11 @@ using Lykke.SettingsReader;
 
 namespace Lykke.Service.GenericEthereumIntegration.Api.Repositories.Factories
 {
-    public class RepositoryFactory : RepositoryFactoryBase
+    internal class RepositoryFactory : RepositoryFactoryBase
     {
-        public RepositoryFactory(
-            IReloadingManager<string> connectionString,
-            ILog log) 
+        internal RepositoryFactory(
+            [NotNull] IReloadingManager<string> connectionString,
+            [NotNull] ILog log) 
             : base(
                 connectionString,
                 log)
@@ -18,7 +19,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Repositories.Factories
 
         }
 
-
+        [NotNull]
         public IGasPriceRepository BuildGasPriceRepository()
         {
             return new GasPriceRepository

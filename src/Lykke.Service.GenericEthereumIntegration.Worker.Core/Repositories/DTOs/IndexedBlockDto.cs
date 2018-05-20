@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 
+
 namespace Lykke.Service.GenericEthereumIntegration.Worker.Core.Repositories.DTOs
 {
     public class IndexedBlockDto

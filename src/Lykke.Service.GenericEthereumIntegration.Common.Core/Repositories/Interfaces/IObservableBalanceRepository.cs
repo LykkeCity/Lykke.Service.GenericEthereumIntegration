@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Repositories.DTOs;
 
 namespace Lykke.Service.GenericEthereumIntegration.Common.Core.Repositories.Interfaces
 {
     public interface IObservableBalanceRepository
     {
-        Task<bool> DeleteIfExistsAsync(string address);
+        Task<bool> DeleteIfExistsAsync([NotNull] string address);
 
         Task<bool> ExistsAsync(string address);
 
@@ -15,10 +16,11 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Core.Repositories.Inte
 
         Task<(IEnumerable<ObservableBalanceDto> Balances, string ContinuationToken)> GetAllWithNonZeroAmountAsync(int take, string continuationToken);
 
-        Task<bool> TryAddAsync(string address);
+        Task<bool> TryAddAsync([NotNull] string address);
 
-        Task<ObservableBalanceDto> TryGetAsync(string address);
+        [ItemCanBeNull]
+        Task<ObservableBalanceDto> TryGetAsync([NotNull] string address);
 
-        Task UpdateAmountAsync(string address, BigInteger amount, BigInteger blockNumbber);
+        Task UpdateAmountAsync([NotNull] string address, BigInteger amount, BigInteger blockNumbber);
     }
 }

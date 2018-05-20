@@ -11,6 +11,7 @@ using Lykke.Service.GenericEthereumIntegration.Worker.Core.Modules;
 using Lykke.Service.GenericEthereumIntegration.Worker.Core.Settings;
 using Lykke.Service.GenericEthereumIntegration.Worker.Extensions;
 using Lykke.Service.GenericEthereumIntegration.Worker.Modules;
+using Lykke.Service.GenericEthereumIntegration.Worker.Repositories.Modules;
 using Lykke.Service.GenericEthereumIntegration.Worker.Services.Modules;
 using Lykke.SettingsReader;
 using Microsoft.AspNetCore.Builder;
@@ -95,6 +96,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Worker
             containerBuilder
                 .RegisterModule(new GenericEthereumIntegrationWorkerModule(AppSettings.CurrentValue.GenericEthereumIntegrationWorker))
                 .RegisterModule<CoreModule>()
+                .RegisterModule(new RepositoriesModule(null, Log))
                 .RegisterModule<ServicesModule>();
         }
     }

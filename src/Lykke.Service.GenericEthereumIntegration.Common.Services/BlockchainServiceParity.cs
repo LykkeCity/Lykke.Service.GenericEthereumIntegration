@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Services.DTOs;
 using Lykke.Service.GenericEthereumIntegration.Common.Services.Models.Parity;
 using Nethereum.Hex.HexTypes;
@@ -17,7 +18,8 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Services
     {
         private readonly Web3Parity _web3Parity;
 
-        public BlockchainServiceParity(Web3Parity web3Parity) 
+        public BlockchainServiceParity(
+            [NotNull] Web3Parity web3Parity) 
             : base(web3Parity)
         {
             _web3Parity = web3Parity;
@@ -34,6 +36,9 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Services
 
         public override async Task<IEnumerable<TransactionDto>> GetTransactionsAsync(BigInteger blockNumber)
         {
+            throw new NotImplementedException();
+            
+            
             var blocks = _web3Parity.Eth.Blocks;
             var block = await blocks.GetBlockWithTransactionsByNumber.SendRequestAsync(new HexBigInteger(blockNumber));
 

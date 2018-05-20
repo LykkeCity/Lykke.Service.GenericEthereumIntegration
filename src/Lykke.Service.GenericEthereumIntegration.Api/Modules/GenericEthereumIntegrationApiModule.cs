@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using JetBrains.Annotations;
 using Lykke.Common.Chaos;
 using Lykke.Service.GenericEthereumIntegration.Api.Core.Settings.Service;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Settings.Integration;
@@ -12,8 +13,8 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Modules
 
 
         public GenericEthereumIntegrationApiModule(
-            ApiSettings apiSettings,
-            IntegrationSettings integrationSettings)
+            [NotNull] ApiSettings apiSettings,
+            [NotNull] IntegrationSettings integrationSettings)
         {
             _apiSettings = apiSettings;
             _integrationSettings = integrationSettings;

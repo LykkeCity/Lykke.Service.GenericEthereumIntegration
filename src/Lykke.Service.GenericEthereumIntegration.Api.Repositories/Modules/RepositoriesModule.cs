@@ -1,6 +1,9 @@
 ﻿using Autofac;
 using Common.Log;
+using JetBrains.Annotations;
+using Lykke.Service.GenericEthereumIntegration.Api.Core.Repositories.Interfaces;
 using Lykke.Service.GenericEthereumIntegration.Api.Repositories.Factories;
+using Lykke.Service.GenericEthereumIntegration.Common.Core.Repositories.Interfaces;
 using Lykke.SettingsReader;
 
 
@@ -12,8 +15,8 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Repositories.Modules
         
 
         public RepositoriesModule(
-            IReloadingManager<string> connectionString,
-            ILog log)
+            [NotNull] IReloadingManager<string> connectionString,
+            [NotNull] ILog log)
         {
             _repositoryFactory = new RepositoryFactory(connectionString, log);
         }
@@ -22,27 +25,27 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Repositories.Modules
         {
             builder
                 .Register(x => _repositoryFactory.BuildGasPriceRepository())
-                .AsSelf()
+                .As<IGasPriceRepository>()
                 .SingleInstance();
 
             builder
                 .Register(x => _repositoryFactory.BuildHistoricalTransactionRepository())
-                .AsSelf()
+                .As<IHistoricalTransactionRepository>()
                 .SingleInstance();
 
             builder
                 .Register(x => _repositoryFactory.BuildObservableAddressRepository())
-                .AsSelf()
+                .As<IObservableAddressRepository>()
                 .SingleInstance();
 
             builder
                 .Register(x => _repositoryFactory.BuildObservableBalanceRepository())
-                .AsSelf()
+                .As<IObservableBalanceRepository>()
                 .SingleInstance();
 
             builder
                 .Register(x => _repositoryFactory.BuildTransactionRepository())
-                .AsSelf()
+                .As<ITransactionRepository>()
                 .SingleInstance();
         }
     }
