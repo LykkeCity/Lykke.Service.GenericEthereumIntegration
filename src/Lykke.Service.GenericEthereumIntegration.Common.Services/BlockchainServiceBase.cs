@@ -6,8 +6,10 @@ using JetBrains.Annotations;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Exceptions;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Services.DTOs;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Services.Interfaces;
+using Lykke.Service.GenericEthereumIntegration.Common.Core.Utils;
 using Nethereum.Hex.HexConvertors.Extensions;
 using Nethereum.Hex.HexTypes;
+using Nethereum.JsonRpc.Client;
 using Nethereum.RLP;
 using Nethereum.RPC.Eth.DTOs;
 using Nethereum.Web3;
@@ -38,6 +40,11 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Services
             if (string.IsNullOrEmpty(to))
             {
                 throw new ArgumentException(CommonExceptionMessages.ShouldNotBeNullOrEmpty, nameof(to));
+            }
+
+            if (!AddressChecksum.Validate(to))
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeValidAddress, nameof(to));
             }
 
             if (amount <= 0)
@@ -84,6 +91,11 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Services
                 throw new ArgumentException(CommonExceptionMessages.ShouldNotBeNullOrEmpty, nameof(to));
             }
             
+            if (!await AddressChecksum.ValidateAsync(to))
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeValidAddress, nameof(to));
+            }
+            
             if (amount <= 0)
             {
                 throw new ArgumentException(CommonExceptionMessages.ShouldBeGreaterOrEqualToZero, nameof(amount));
@@ -118,17 +130,19 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Services
             
             #endregion
             
-            var block = new BlockParameter((ulong)blockNumber);
+            try
+            {
+                var block = new BlockParameter((ulong)blockNumber);
 
-            return await GetBalanceAsync(address, block);
+                return (await _web3.Eth.GetBalance.SendRequestAsync(address, block))
+                    .Value;
+            }
+            catch (RpcResponseException e) when (e.RpcError.Code == -32602)
+            {
+                throw new ArgumentOutOfRangeException("Block number is too high.", e);
+            }
         }
 
-        private async Task<BigInteger> GetBalanceAsync(string address, BlockParameter blockParameter)
-        {
-            return (await _web3.Eth.GetBalance.SendRequestAsync(address, blockParameter))
-                .Value;
-        }
-        
         /// <inheritdoc />
         public async Task<string> GetBlockHashAsync(BigInteger blockNumber)
         {
@@ -180,6 +194,8 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Services
             }
             
             #endregion
+            
+            // TODO: What if block is not found, or timestamp is null (can it be null?)
             
             var block = await _web3.Eth.Blocks.GetBlockWithTransactionsByNumber.SendRequestAsync(new HexBigInteger(blockNumber));
 

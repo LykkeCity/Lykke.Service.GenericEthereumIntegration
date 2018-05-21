@@ -30,7 +30,11 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
 
         public async Task BeginObservationAsync(string address)
         {
+            #region Validation
+            
             await ValidateInputParameterAsync(address);
+            
+            #endregion
             
             if (await _observableBalanceRepository.TryAddAsync(address))
             {
@@ -42,7 +46,11 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
 
         public async Task EndObservationAsync(string address)
         {
+            #region Validation
+            
             await ValidateInputParameterAsync(address);
+            
+            #endregion
             
             if (await _observableBalanceRepository.DeleteIfExistsAsync(address))
             {
@@ -54,10 +62,14 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
 
         public async Task<(IEnumerable<ObservableBalanceDto> balances, string assetId, string continuationToken)> GetBalancesAsync(int take, string continuationToken)
         {
+            #region Validation
+            
             if (take <= 0)
             {
                 throw new ArgumentException("Should be greater than zero.", nameof(take));
             }
+            
+            #endregion
             
             IEnumerable<ObservableBalanceDto> balances;
 
@@ -73,7 +85,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
                 throw new ArgumentException("Should not be null or empty.", nameof(address));
             }
 
-            if (await AddressValidator.ValidateAsync(address))
+            if (await AddressChecksum.ValidateAsync(address))
             {
                 throw new ArgumentException("Should be a valid address.", nameof(address));
             }

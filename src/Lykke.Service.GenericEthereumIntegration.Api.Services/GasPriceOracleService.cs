@@ -31,12 +31,14 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
 
         public async Task<BigInteger> CalculateGasPriceAsync(string to, BigInteger amount)
         {
+            #region Validation
+            
             if (string.IsNullOrEmpty(to))
             {
                 throw new ArgumentException("Should not be null or empty.", nameof(to));
             }
 
-            if (!AddressValidator.ValidateAsync(to).Result)
+            if (!AddressChecksum.ValidateAsync(to).Result)
             {
                 throw new ArgumentException("Should be a valid address.", nameof(to));
             }
@@ -45,6 +47,8 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
             {
                 throw new ArgumentException("Should be greater than zero.", nameof(amount));
             }
+            
+            #endregion
             
             var (minGasPrice, maxGasPrice) = await _gasPriceRepository.GetOrAddAsync
             (

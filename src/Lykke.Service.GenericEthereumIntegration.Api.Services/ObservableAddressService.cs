@@ -23,7 +23,11 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
 
         public async Task AddToIncomingObservationListAsync(string address)
         {
+            #region Validation
+            
             await ValidateInputParameterAsync(address);
+            
+            #endregion
             
             if (await _observableAddressRepository.TryAddToIncomingObservationListAsync(address))
             {
@@ -35,7 +39,11 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
 
         public async Task AddToOutgoingObservationListAsync(string address)
         {
+            #region Validation
+            
             await ValidateInputParameterAsync(address);
+            
+            #endregion
             
             if (await _observableAddressRepository.TryAddToOutgoingObservationListAsync(address))
             {
@@ -47,7 +55,11 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
 
         public async Task DeleteFromIncomingObservationListAsync(string address)
         {
+            #region Validation
+            
             await ValidateInputParameterAsync(address);
+            
+            #endregion
             
             if (await _observableAddressRepository.TryDeleteFromIncomingObservationListAsync(address))
             {
@@ -59,7 +71,11 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
 
         public async Task DeleteFromOutgoingObservationListAsync(string address)
         {
+            #region Validation
+            
             await ValidateInputParameterAsync(address);
+            
+            #endregion
             
             if (await _observableAddressRepository.TryDeleteFromOutgoingObservationListAsync(address))
             {
@@ -76,7 +92,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
                 throw new ArgumentException("Should not be null or empty.", nameof(address));
             }
 
-            if (await AddressValidator.ValidateAsync(address))
+            if (await AddressChecksum.ValidateAsync(address))
             {
                 throw new ArgumentException("Should be a valid address.", nameof(address));
             }

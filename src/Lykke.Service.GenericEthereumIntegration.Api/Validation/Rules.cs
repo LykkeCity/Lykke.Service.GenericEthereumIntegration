@@ -18,7 +18,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Validation
         public static void AddressMustBeValid<T>(this IRuleBuilderInitial<T, string> ruleBuilder)
         {
             ruleBuilder
-                .MustAsync((address, ct) => AddressValidator.ValidateAsync(address))
+                .MustAsync((address, ct) => AddressChecksum.ValidateAsync(address))
                 .WithMessage(x => $"Specified address [{x}] is invalid.");
         }
 

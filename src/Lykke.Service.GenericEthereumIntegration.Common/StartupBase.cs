@@ -279,6 +279,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common
 
                     (Log as IDisposable)?.Dispose();
                 }
+                
                 throw;
             }
         }

@@ -23,12 +23,16 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
 
         public async Task<bool> ValidateAsync(string address)
         {
+            #region Validation
+            
             if (string.IsNullOrEmpty(address))
             {
                 throw new ArgumentException("Should not be null or empty.", nameof(address));
             }
             
-            return await AddressValidator.ValidateAsync(address)
+            #endregion
+            
+            return await AddressChecksum.ValidateAsync(address)
                 && await _blockchainService.IsWalletAsync(address);
         }
     }

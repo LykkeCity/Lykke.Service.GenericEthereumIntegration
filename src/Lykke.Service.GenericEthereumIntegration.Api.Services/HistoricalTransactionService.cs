@@ -30,7 +30,11 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
 
         public async Task<(IEnumerable<HistoricalTransactionDto> transactions, string assetId)> GetIncomingHistoryAsync(string address, int take, string afterHash)
         {
-            await ValidatInputParametersAsync(address, take);
+            #region Validation
+            
+            await ValidateInputParametersAsync(address, take);
+            
+            #endregion
             
             var transactions = await _historicalTransactionRepository.GetIncomingHistory(address, take, afterHash);
 
@@ -39,21 +43,25 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
 
         public async Task<(IEnumerable<HistoricalTransactionDto> transactions, string assetId)> GetOutgoingHistoryAsync(string address, int take, string afterHash)
         {
-            await ValidatInputParametersAsync(address, take);
+            #region Validation
+            
+            await ValidateInputParametersAsync(address, take);
+            
+            #endregion
             
             var transactions = await _historicalTransactionRepository.GetOutgoingHistory(address, take, afterHash);
 
             return (transactions, _assetSettings.Id);
         }
 
-        private async Task ValidatInputParametersAsync(string address, int take)
+        private async Task ValidateInputParametersAsync(string address, int take)
         {
             if (string.IsNullOrEmpty(address))
             {
                 throw new ArgumentException("Should not be null or empty.", nameof(address));
             }
 
-            if (await AddressValidator.ValidateAsync(address))
+            if (await AddressChecksum.ValidateAsync(address))
             {
                 throw new ArgumentException("Should be a valid address.", nameof(address));
             }

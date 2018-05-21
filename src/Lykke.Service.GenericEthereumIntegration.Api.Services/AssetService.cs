@@ -33,10 +33,14 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
 
         public AssetDto GetAsset(string assetId)
         {
+            #region Validation
+            
             if (string.IsNullOrEmpty(assetId))
             {
                 throw new ArgumentException("Should not be null or empty.", nameof(assetId));
             }
+            
+            #endregion
             
             if (assetId == _asset.AssetId)
             {

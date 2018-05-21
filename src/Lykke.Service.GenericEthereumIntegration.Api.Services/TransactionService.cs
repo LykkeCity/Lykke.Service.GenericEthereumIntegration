@@ -107,7 +107,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
                 throw new ArgumentException("Should not be null or empty.", nameof(fromAddress));
             }
             
-            if (!await AddressValidator.ValidateAsync(fromAddress))
+            if (!await AddressChecksum.ValidateAsync(fromAddress))
             {
                 throw new ArgumentException("Should be a valid address.", nameof(fromAddress));
             }
@@ -117,7 +117,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
                 throw new ArgumentException("Should not be null or empty.", nameof(toAddress));
             }
             
-            if (!await AddressValidator.ValidateAsync(toAddress))
+            if (!await AddressChecksum.ValidateAsync(toAddress))
             {
                 throw new ArgumentException("Should be a valid address.", nameof(toAddress));
             }

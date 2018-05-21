@@ -23,7 +23,7 @@ namespace Lykke.Service.GenericEthereumIntegration.SignApi.Controllers
         public IActionResult CreateWallet()
         {
             var wallet = _walletService.CreateWallet();
-
+            
             return Ok(new WalletResponse
             {
                 PrivateKey = wallet.PrivateKey,

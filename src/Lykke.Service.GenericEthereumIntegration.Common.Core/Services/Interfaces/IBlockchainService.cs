@@ -14,7 +14,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Core.Services.Interfac
         /// <returns>
         ///     RLP-encoded transaction data in hex format.
         /// </returns>
-        [NotNull]
+        [Pure, NotNull]
         string BuildTransaction([NotNull] string to, BigInteger amount, BigInteger nonce, BigInteger gasPrice, BigInteger gasAmount);
 
         /// <summary>
@@ -39,6 +39,9 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Core.Services.Interfac
         /// <returns>
         ///     A BigInteger instance of the current balance for the given address in wei.
         /// </returns>
+        /// <exception cref="System.ArgumentOutOfRangeException">
+        ///    Thrown when block with a specified number has not been mined yet.
+        /// </exception>
         Task<BigInteger> GetBalanceAsync([NotNull] string address, BigInteger blockNumber);
 
         /// <summary>
