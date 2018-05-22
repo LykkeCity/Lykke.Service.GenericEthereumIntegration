@@ -61,7 +61,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
                 );
             }
 
-            var txData = _blockchainService.UnsignTransaction(signedTxData);
+            var txData = await _blockchainService.UnsignTransactionAsync(signedTxData);
             var builtTransaction = operationTransactions.FirstOrDefault(x => x.TxData == txData && x.State == TransactionState.Built);
 
             if (builtTransaction == null)
@@ -349,7 +349,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
         private async Task<string> SendRawTransactionOrGetTxHashAsync(string signedTxData)
         {
             var txHash = _blockchainService.GetTransactionHash(signedTxData);
-            var receipt = await _blockchainService.GetTransactionReceiptAsync(txHash);
+            var receipt = await _blockchainService.TryGetTransactionReceiptAsync(txHash);
 
             if (receipt == null)
             {
@@ -376,7 +376,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
                     }
                     else
                     {
-                        if (await _blockchainService.GetTransactionReceiptAsync(txHash) != null)
+                        if (await _blockchainService.TryGetTransactionReceiptAsync(txHash) != null)
                         {
                             return;
                         }

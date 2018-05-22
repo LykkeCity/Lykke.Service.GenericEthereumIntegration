@@ -25,6 +25,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Services
             _web3Parity = web3Parity;
         }
 
+        /// <inheritdoc />
         public override async Task<BigInteger> GetNextNonceAsync(string address)
         {
             var request = new RpcRequest($"{Guid.NewGuid()}", "parity_nextNonce", address);
@@ -34,6 +35,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Services
             return result.Value;
         }
 
+        /// <inheritdoc />
         public override async Task<IEnumerable<TransactionDto>> GetTransactionsAsync(BigInteger blockNumber)
         {
             throw new NotImplementedException();
@@ -65,6 +67,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Services
             return transactions;
         }
 
+        /// <inheritdoc />
         public override async Task<string> GetTransactionErrorAsync(string txHash)
         {
             var traces = await GetTransactionTracesAsync(txHash);

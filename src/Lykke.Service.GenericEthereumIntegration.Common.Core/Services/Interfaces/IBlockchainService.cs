@@ -23,7 +23,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Core.Services.Interfac
         /// <returns>
         ///    True, if added successfully
         /// </returns>
-        Task<bool> CheckIfBroadcastedAsync([NotNull] string transactionHash);
+        Task<bool> CheckIfBroadcastedAsync([NotNull] string txHash);
 
         /// <summary>
         ///     Estimates gas price for simple transfer transaction.
@@ -40,15 +40,19 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Core.Services.Interfac
         ///     A BigInteger instance of the current balance for the given address in wei.
         /// </returns>
         /// <exception cref="System.ArgumentOutOfRangeException">
-        ///    Thrown when block with a specified number has not been mined yet.
+        ///    Thrown when block with a specified has not been mined yet.
         /// </exception>
         Task<BigInteger> GetBalanceAsync([NotNull] string address, BigInteger blockNumber);
 
         /// <summary>
         ///    Get hash of a specified block.
         /// </summary>
+        /// <exception cref="System.ArgumentOutOfRangeException">
+        ///    Thrown when block with a specified has not been mined yet.
+        /// </exception>
+        [ItemNotNull]
         Task<string> GetBlockHashAsync(BigInteger blockNumber);
-
+        
         /// <summary>
         ///    Get the code at a specific address.
         /// </summary>
@@ -70,7 +74,9 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Core.Services.Interfac
         /// <summary>
         ///    Get the timestamp of a specified block.
         /// </summary>
-        ///
+        /// <exception cref="System.ArgumentOutOfRangeException">
+        ///    Thrown when block with a specified has not been mined yet.
+        /// </exception>
         Task<BigInteger> GetTimestampAsync(BigInteger blockNumber);
 
         /// <summary>
@@ -81,12 +87,8 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Core.Services.Interfac
         /// <summary>
         ///    Get the hash of the specified transaction.
         /// </summary>
+        [NotNull]
         string GetTransactionHash([NotNull] string txData);
-
-        /// <summary>
-        ///     Get the receipt of a specified transaction.
-        /// </summary>
-        Task<TransactionReceiptDto> GetTransactionReceiptAsync([NotNull] string txHash);
 
         /// <summary>
         ///    Get list of transactions in a block.
@@ -94,11 +96,12 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Core.Services.Interfac
         Task<IEnumerable<TransactionDto>> GetTransactionsAsync(BigInteger blockNumber);
 
         /// <summary>
-        /// Get Signer public address for signed transaction
+        ///    Get Signer public address for signed transaction.
         /// </summary>
         /// <returns>
-        ///    Signer public address
+        ///    Signer's public address
         /// </returns>
+        [NotNull, Pure]
         string GetTransactionSigner([NotNull] string signedTxData);
 
         /// <summary>
@@ -107,14 +110,25 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Core.Services.Interfac
         /// <returns>
         ///     Transaction hash as hex string.
         /// </returns>
+        [NotNull]
         Task<string> SendRawTransactionAsync([NotNull] string signedTxData);
 
+        /// <summary>
+        ///    Get the receipt of a specified transaction.
+        /// </summary>
+        /// <returns>
+        ///    Returns receipt of transaction associated with specified hash, or null if transaction does not exist in a blockchain.
+        /// </returns>
+        [ItemCanBeNull]
+        Task<TransactionReceiptDto> TryGetTransactionReceiptAsync([NotNull] string txHash);
+        
         /// <summary>
         ///    Get an unsigned transaction from the signed one.
         /// </summary>
         /// <returns>
         ///    Unsigned transaction data as a hex string.
         /// </returns>
-        string UnsignTransaction([NotNull] string signedTxData);
+        [ItemNotNull, Pure]
+        Task<string> UnsignTransactionAsync([NotNull] string signedTxData);
     }
 }

@@ -37,7 +37,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Services
         {
             #region Validation
             
-            if (string.IsNullOrEmpty(to))
+            if (to.IsNullOrEmpty())
             {
                 throw new ArgumentException(CommonExceptionMessages.ShouldNotBeNullOrEmpty, nameof(to));
             }
@@ -78,7 +78,31 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Services
                 gasLimit: gasAmount
             );
 
-            return transaction.GetRLPEncoded().ToHex();
+            return transaction
+                .GetRLPEncoded()
+                .ToHex(prefix: true);
+        }
+        
+        /// <inheritdoc />
+        public async Task<bool> CheckIfBroadcastedAsync(string txHash)
+        {
+            #region Validation
+            
+            if (txHash.IsNullOrEmpty())
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldNotBeNullOrEmpty, nameof(txHash));
+            }
+
+            if (txHash.IsNotHexString())
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeValidHexString, nameof(txHash));
+            }
+            
+            #endregion
+            
+            var transaction = await _web3.Eth.Transactions.GetTransactionByHash.SendRequestAsync(txHash);
+
+            return transaction != null && transaction.BlockNumber.Value == 0;
         }
 
         /// <inheritdoc />
@@ -86,7 +110,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Services
         {
             #region Validation
             
-            if (string.IsNullOrEmpty(to))
+            if (to.IsNullOrEmpty())
             {
                 throw new ArgumentException(CommonExceptionMessages.ShouldNotBeNullOrEmpty, nameof(to));
             }
@@ -118,9 +142,14 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Services
         {
             #region Validation
             
-            if (string.IsNullOrEmpty(address))
+            if (address.IsNullOrEmpty())
             {
                 throw new ArgumentException(CommonExceptionMessages.ShouldNotBeNullOrEmpty, nameof(address));
+            }
+
+            if (!AddressChecksum.Validate(address))
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeValidAddress, nameof(address));
             }
             
             if (blockNumber < 0)
@@ -139,7 +168,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Services
             }
             catch (RpcResponseException e) when (e.RpcError.Code == -32602)
             {
-                throw new ArgumentOutOfRangeException("Block number is too high.", e);
+                throw new ArgumentOutOfRangeException(CommonExceptionMessages.BlockNumberIsTooHigh, e);
             }
         }
 
@@ -157,7 +186,8 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Services
             
             var block = await _web3.Eth.Blocks.GetBlockWithTransactionsByNumber.SendRequestAsync(new HexBigInteger(blockNumber));
 
-            return block.BlockHash;
+            return block?.BlockHash
+                ?? throw new ArgumentOutOfRangeException(CommonExceptionMessages.BlockNumberIsTooHigh);
         }
 
         /// <inheritdoc />
@@ -165,7 +195,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Services
         {
             #region Validation
             
-            if (string.IsNullOrEmpty(address))
+            if (address.IsNullOrEmpty())
             {
                 throw new ArgumentException(CommonExceptionMessages.ShouldNotBeNullOrEmpty, nameof(address));
             }
@@ -184,6 +214,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Services
         /// <inheritdoc />
         public abstract Task<BigInteger> GetNextNonceAsync(string address);
         
+        /// <inheritdoc />
         public async Task<BigInteger> GetTimestampAsync(BigInteger blockNumber)
         {
             #region Validation
@@ -195,38 +226,98 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Services
             
             #endregion
             
-            // TODO: What if block is not found, or timestamp is null (can it be null?)
-            
             var block = await _web3.Eth.Blocks.GetBlockWithTransactionsByNumber.SendRequestAsync(new HexBigInteger(blockNumber));
 
-            return block.Timestamp.Value;
+            return block?.Timestamp.Value 
+                ?? throw new ArgumentOutOfRangeException(CommonExceptionMessages.BlockNumberIsTooHigh);
         }
 
+        /// <inheritdoc />
+        public abstract Task<string> GetTransactionErrorAsync(string txHash);
+        
         /// <inheritdoc />
         public string GetTransactionHash(string txData)
         {
             #region Validation
             
-            if (string.IsNullOrEmpty(txData))
+            if (txData.IsNullOrEmpty())
             {
                 throw new ArgumentException(CommonExceptionMessages.ShouldNotBeNullOrEmpty, nameof(txData));
             }
+
+            if (txData.IsNotHexString())
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeValidHexString, nameof(txData));
+            }
             
             #endregion
+
+            var txDataBytes = HexToBytesArray(txData);
             
-            return (new Transaction(CommonUtils.HexToArray(txData)))
-                .RawHash
+            return (new Transaction(txDataBytes)).RawHash
                 .ToHex(true);
         }
 
         /// <inheritdoc />
-        public async Task<TransactionReceiptDto> GetTransactionReceiptAsync(string txHash)
+        public string GetTransactionSigner(string signedTxData)
         {
             #region Validation
             
-            if (string.IsNullOrEmpty(txHash))
+            if (signedTxData.IsNullOrEmpty())
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldNotBeNullOrEmpty, nameof(signedTxData));
+            }
+
+            if (signedTxData.IsNotHexString())
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeValidHexString, nameof(signedTxData));
+            }
+            
+            #endregion
+
+            var signedTxDataBytes = HexToBytesArray(signedTxData);
+            var signedTransaction = new Transaction(signedTxDataBytes);
+            var signerPublicAddress = signedTransaction.Key?.GetPublicAddress();
+
+            return signerPublicAddress;
+        }
+
+        /// <inheritdoc />
+        public abstract Task<IEnumerable<TransactionDto>> GetTransactionsAsync(BigInteger blockNumber);
+
+        /// <inheritdoc />
+        public async Task<string> SendRawTransactionAsync(string signedTxData)
+        {
+            #region Validation
+            
+            if (signedTxData.IsNullOrEmpty())
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldNotBeNullOrEmpty, nameof(signedTxData));
+            }
+            
+            if (signedTxData.IsNotHexString())
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeValidHexString, nameof(signedTxData));
+            }
+            
+            #endregion
+            
+            return await _web3.Eth.Transactions.SendRawTransaction.SendRequestAsync(signedTxData);
+        }
+
+        /// <inheritdoc />
+        public async Task<TransactionReceiptDto> TryGetTransactionReceiptAsync(string txHash)
+        {
+            #region Validation
+            
+            if (txHash.IsNullOrEmpty())
             {
                 throw new ArgumentException(CommonExceptionMessages.ShouldNotBeNullOrEmpty, nameof(txHash));
+            }
+            
+            if (txHash.IsNotHexString())
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeValidHexString, nameof(txHash));
             }
             
             #endregion
@@ -254,31 +345,9 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Services
 
             return null;
         }
-
-        public abstract Task<IEnumerable<TransactionDto>> GetTransactionsAsync(BigInteger blockNumber);
-
+        
         /// <inheritdoc />
-        public async Task<bool> CheckIfBroadcastedAsync(string transactionHash)
-        {
-            #region Validation
-            
-            if (string.IsNullOrEmpty(transactionHash))
-            {
-                throw new ArgumentException(CommonExceptionMessages.ShouldNotBeNullOrEmpty, nameof(transactionHash));
-            }
-            
-            #endregion
-            
-            var transaction = await _web3.Eth.Transactions.GetTransactionByHash.SendRequestAsync(transactionHash);
-
-            return transaction != null && transaction.BlockNumber.Value == 0;
-        }
-
-        /// <inheritdoc />
-        public abstract Task<string> GetTransactionErrorAsync(string txHash);
-
-        /// <inheritdoc />
-        public async Task<string> SendRawTransactionAsync(string signedTxData)
+        public async Task<string> UnsignTransactionAsync(string signedTxData)
         {
             #region Validation
             
@@ -287,24 +356,15 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Services
                 throw new ArgumentException(CommonExceptionMessages.ShouldNotBeNullOrEmpty, nameof(signedTxData));
             }
             
-            #endregion
-            
-            return await _web3.Eth.Transactions.SendRawTransaction.SendRequestAsync(signedTxData);
-        }
-
-        /// <inheritdoc />
-        public string UnsignTransaction(string signedTxData)
-        {
-            #region Validation
-            
-            if (string.IsNullOrEmpty(signedTxData))
+            if (signedTxData.IsNotHexString())
             {
-                throw new ArgumentException(CommonExceptionMessages.ShouldNotBeNullOrEmpty, nameof(signedTxData));
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeValidHexString, nameof(signedTxData));
             }
             
             #endregion
-            
-            var signedTransaction = new Transaction(CommonUtils.HexToArray(signedTxData));
+
+            var signedTxDataByte = HexToBytesArray(signedTxData);
+            var signedTransaction = new Transaction(signedTxDataByte);
 
             if (signedTransaction.Data != null)
             {
@@ -317,24 +377,20 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Services
             var gasPrice = signedTransaction.GasPrice.ToBigIntegerFromRLPDecoded();
             var gasLimit = signedTransaction.GasLimit.ToBigIntegerFromRLPDecoded();
 
+            to = await AddressChecksum.EncodeAsync(to);
+            
             return BuildTransaction(to, amount, nonce, gasPrice, gasLimit);
         }
 
-        public string GetTransactionSigner(string signedTxData)
+        
+        private static byte[] HexToBytesArray(string hexString)
         {
-            #region Validation
-            
-            if (string.IsNullOrEmpty(signedTxData))
+            if (hexString.StartsWith("0x"))
             {
-                throw new ArgumentException(CommonExceptionMessages.ShouldNotBeNullOrEmpty, nameof(signedTxData));
+                hexString = hexString.Remove(0, 2);
             }
-            
-            #endregion
-            
-            var signedTransaction = new Transaction(CommonUtils.HexToArray(signedTxData));
-            var signerPublicAddress = signedTransaction.Key?.GetPublicAddress().ToLowerInvariant();
 
-            return signerPublicAddress;
+            return CommonUtils.HexToArray(hexString);
         }
     }
 }

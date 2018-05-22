@@ -30,7 +30,7 @@ namespace Lykke.Service.GenericEthereumIntegration.SignApi.Services
 
             return transaction
                 .GetRLPEncoded()
-                .ToHex();
+                .ToHex(prefix: true);
         }
     }
 }
