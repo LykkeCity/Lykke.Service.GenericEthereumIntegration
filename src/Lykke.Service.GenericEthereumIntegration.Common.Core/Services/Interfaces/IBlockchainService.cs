@@ -59,6 +59,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Core.Services.Interfac
         /// <returns>
         ///    The data at given address as a hex string (or 0x for wallets).
         /// </returns>
+        [ItemNotNull]
         Task<string> GetCodeAsync([NotNull] string address);
         
         /// <summary>
@@ -80,27 +81,26 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Core.Services.Interfac
         Task<BigInteger> GetTimestampAsync(BigInteger blockNumber);
 
         /// <summary>
-        ///    Get first error in a transaction.
-        /// </summary>
-        Task<string> GetTransactionErrorAsync([NotNull] string txHash);
-
-        /// <summary>
         ///    Get the hash of the specified transaction.
         /// </summary>
-        [NotNull]
+        [NotNull, Pure]
         string GetTransactionHash([NotNull] string txData);
 
         /// <summary>
         ///    Get list of transactions in a block.
         /// </summary>
+        [ItemNotNull]
         Task<IEnumerable<TransactionDto>> GetTransactionsAsync(BigInteger blockNumber);
 
         /// <summary>
-        ///    Get Signer public address for signed transaction.
+        ///    Get signer's public address for signed transaction.
         /// </summary>
         /// <returns>
         ///    Signer's public address
         /// </returns>
+        /// <exception cref="System.InvalidOperationException">
+        ///    Thrown if specified transaction has not been signed.
+        /// </exception>
         [NotNull, Pure]
         string GetTransactionSigner([NotNull] string signedTxData);
 
@@ -113,6 +113,15 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Core.Services.Interfac
         [NotNull]
         Task<string> SendRawTransactionAsync([NotNull] string signedTxData);
 
+        /// <summary>
+        ///    Get list of transaction errors.
+        /// </summary>
+        /// <returns>
+        ///    Returns list of transaction errors, or null if transaction does not exist in a blockchain.
+        /// </returns>
+        [ItemCanBeNull]
+        Task<IEnumerable<string>> TryGetTransactionErrorsAsync([NotNull] string txHash);
+        
         /// <summary>
         ///    Get the receipt of a specified transaction.
         /// </summary>
@@ -128,6 +137,9 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Core.Services.Interfac
         /// <returns>
         ///    Unsigned transaction data as a hex string.
         /// </returns>
+        /// <exception cref="System.InvalidOperationException">
+        ///    Thrown if specified transaction has not been signed.
+        /// </exception>
         [ItemNotNull, Pure]
         Task<string> UnsignTransactionAsync([NotNull] string signedTxData);
     }

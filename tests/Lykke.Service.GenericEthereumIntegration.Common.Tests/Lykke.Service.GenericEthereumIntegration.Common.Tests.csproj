@@ -15,4 +15,9 @@
     <ProjectReference Include="..\..\src\Lykke.Service.GenericEthereumIntegration.Common.Repositories\Lykke.Service.GenericEthereumIntegration.Common.Repositories.csproj" />
     <ProjectReference Include="..\..\src\Lykke.Service.GenericEthereumIntegration.Common\Lykke.Service.GenericEthereumIntegration.Common.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="appsettings.development.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

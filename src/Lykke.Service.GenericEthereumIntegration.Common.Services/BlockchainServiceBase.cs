@@ -49,22 +49,22 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Services
 
             if (amount <= 0)
             {
-                throw new ArgumentException(CommonExceptionMessages.ShouldBeGreaterOrEqualToZero, nameof(amount));
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeGreaterThanZero, nameof(amount));
             }
             
             if (nonce < 0)
             {
-                throw new ArgumentException(CommonExceptionMessages.ShouldBeGreaterThanZero, nameof(nonce));
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeGreaterOrEqualToZero, nameof(nonce));
             }
             
             if (gasPrice <= 0)
             {
-                throw new ArgumentException(CommonExceptionMessages.ShouldBeGreaterOrEqualToZero, nameof(gasPrice));
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeGreaterThanZero, nameof(gasPrice));
             }
             
             if (gasAmount <= 0)
             {
-                throw new ArgumentException(CommonExceptionMessages.ShouldBeGreaterOrEqualToZero, nameof(gasAmount));
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeGreaterThanZero, nameof(gasAmount));
             }
             
             #endregion
@@ -122,7 +122,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Services
             
             if (amount <= 0)
             {
-                throw new ArgumentException(CommonExceptionMessages.ShouldBeGreaterOrEqualToZero, nameof(amount));
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeGreaterThanZero, nameof(amount));
             }
             
             #endregion
@@ -154,7 +154,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Services
             
             if (blockNumber < 0)
             {
-                throw new ArgumentException(CommonExceptionMessages.ShouldBeGreaterThanZero, nameof(blockNumber));
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeGreaterOrEqualToZero, nameof(blockNumber));
             }
             
             #endregion
@@ -179,7 +179,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Services
             
             if (blockNumber < 0)
             {
-                throw new ArgumentException(CommonExceptionMessages.ShouldBeGreaterThanZero, nameof(blockNumber));
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeGreaterOrEqualToZero, nameof(blockNumber));
             }
             
             #endregion
@@ -198,6 +198,11 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Services
             if (address.IsNullOrEmpty())
             {
                 throw new ArgumentException(CommonExceptionMessages.ShouldNotBeNullOrEmpty, nameof(address));
+            }
+            
+            if (!AddressChecksum.Validate(address))
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeValidAddress, nameof(address));
             }
             
             #endregion
@@ -221,7 +226,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Services
             
             if (blockNumber < 0)
             {
-                throw new ArgumentException(CommonExceptionMessages.ShouldBeGreaterThanZero, nameof(blockNumber));
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeGreaterOrEqualToZero, nameof(blockNumber));
             }
             
             #endregion
@@ -233,7 +238,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Services
         }
 
         /// <inheritdoc />
-        public abstract Task<string> GetTransactionErrorAsync(string txHash);
+        public abstract Task<IEnumerable<string>> TryGetTransactionErrorsAsync(string txHash);
         
         /// <inheritdoc />
         public string GetTransactionHash(string txData)
@@ -277,7 +282,8 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Services
 
             var signedTxDataBytes = HexToBytesArray(signedTxData);
             var signedTransaction = new Transaction(signedTxDataBytes);
-            var signerPublicAddress = signedTransaction.Key?.GetPublicAddress();
+
+            var signerPublicAddress = signedTransaction.Key.GetPublicAddress();
 
             return signerPublicAddress;
         }

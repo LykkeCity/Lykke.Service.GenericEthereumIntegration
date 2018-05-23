@@ -4,7 +4,9 @@ using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
+using Lykke.Service.GenericEthereumIntegration.Common.Core.Exceptions;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Services.DTOs;
+using Lykke.Service.GenericEthereumIntegration.Common.Core.Utils;
 using Lykke.Service.GenericEthereumIntegration.Common.Services.Models.Parity;
 using Nethereum.Hex.HexTypes;
 using Nethereum.JsonRpc.Client;
@@ -28,6 +30,20 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Services
         /// <inheritdoc />
         public override async Task<BigInteger> GetNextNonceAsync(string address)
         {
+            #region Validation
+            
+            if (address.IsNullOrEmpty())
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldNotBeNullOrEmpty, nameof(address));
+            }
+
+            if (!AddressChecksum.Validate(address))
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeValidAddress, nameof(address));
+            }
+            
+            #endregion
+            
             var request = new RpcRequest($"{Guid.NewGuid()}", "parity_nextNonce", address);
             var response = await _web3Parity.Client.SendRequestAsync<string>(request);
             var result = new HexBigInteger(response);
@@ -38,8 +54,14 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Services
         /// <inheritdoc />
         public override async Task<IEnumerable<TransactionDto>> GetTransactionsAsync(BigInteger blockNumber)
         {
-            throw new NotImplementedException();
+            #region Validation
             
+            if (blockNumber < 0)
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeGreaterOrEqualToZero, nameof(blockNumber));
+            }
+            
+            #endregion
             
             var blocks = _web3Parity.Eth.Blocks;
             var block = await blocks.GetBlockWithTransactionsByNumber.SendRequestAsync(new HexBigInteger(blockNumber));
@@ -68,11 +90,27 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Services
         }
 
         /// <inheritdoc />
-        public override async Task<string> GetTransactionErrorAsync(string txHash)
+        public override async Task<IEnumerable<string>> TryGetTransactionErrorsAsync(string txHash)
         {
+            #region Validation
+            
+            if (txHash.IsNullOrEmpty())
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldNotBeNullOrEmpty, nameof(txHash));
+            }
+            
+            if (txHash.IsNotHexString())
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeValidHexString, nameof(txHash));
+            }
+            
+            #endregion
+            
             var traces = await GetTransactionTracesAsync(txHash);
 
-            return traces.Select(x => x.Error).FirstOrDefault();
+            return traces?
+                .Select(x => x.Error)
+                .Where(x => x.IsNotNullOrEmpty());
         }
 
         private async Task<IEnumerable<TransactionTrace>> GetTransactionTracesAsync(string txHash)
