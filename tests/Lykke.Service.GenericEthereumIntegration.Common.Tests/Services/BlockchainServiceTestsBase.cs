@@ -5,6 +5,7 @@ using System.Numerics;
 using System.Threading.Tasks;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Services.DTOs;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Services.Interfaces;
+using Lykke.Service.GenericEthereumIntegration.Common.Core.Utils;
 using Lykke.Service.GenericEthereumIntegration.Common.Services;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.Configuration;
@@ -565,6 +566,35 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
         
         #region GetTransactionsAsync
 
+        public virtual async Task GetTransactionsAsync__BlockIsNotEmpty__ValidTransactionListReturned()
+        {
+            var actualResult = (await BlockchainService.GetTransactionsAsync(2805104)).ToList();
+            
+            Assert.AreEqual(5, actualResult.Count);
+            Assert.AreEqual(0, actualResult.Count(x => x.TransactionFailed));
+            Assert.AreEqual(1, actualResult.Count(x => x.TransactionIsInternal));
+            
+            Assert.AreEqual("0xf4937fC389AdcaFA913E6b7b7C32666daFE31B7D", actualResult[0].FromAddress);
+            Assert.AreEqual("0xF4E6e6fa97E10ddc057c94F501B94C1d24EF85Aa", actualResult[0].ToAddress);
+            Assert.AreEqual(BigInteger.Parse("1001110000000000"), actualResult[0].TransactionAmount);
+            Assert.IsNull(actualResult[0].TransactionError);
+            Assert.IsFalse(actualResult[0].TransactionFailed);
+            Assert.AreEqual("0x6b5420430fa7d6773ac26c95eac40369623efb55099f5868f67bb63276b18ea0", actualResult[0].TransactionHash);
+            Assert.AreEqual(BigInteger.Parse("24"), actualResult[0].TransactionIndex);
+            Assert.IsTrue(actualResult[0].TransactionIsInternal);
+            Assert.AreEqual(BigInteger.Parse("1520643052"), actualResult[0].TransactionTimestamp);
+            
+            Assert.AreEqual("0x81b7E08F65Bdf5648606c89998A9CC8164397647", actualResult[1].FromAddress);
+            Assert.AreEqual("0x3DC62c0ceb148Abd425cdF5bFcC1b6Ff77f462ea", actualResult[1].ToAddress);
+            Assert.AreEqual(BigInteger.Parse("1000000000000000000"), actualResult[1].TransactionAmount);
+            Assert.IsNull(actualResult[1].TransactionError);
+            Assert.IsFalse(actualResult[1].TransactionFailed);
+            Assert.AreEqual("0xda95ac4fdb35aa2b9d56bf1d859ca70b67ff82a4100e7bf8209a07e4d2c87dbf", actualResult[1].TransactionHash);
+            Assert.AreEqual(BigInteger.Parse("25"), actualResult[1].TransactionIndex);
+            Assert.IsFalse(actualResult[1].TransactionIsInternal);
+            Assert.AreEqual(BigInteger.Parse("1520643052"), actualResult[1].TransactionTimestamp);
+        }
+        
         public virtual async Task GetTransactionsAsync__BlockIsEmpty__EmptyTransactionListReturned()
         {
             var actualResult = await BlockchainService.GetTransactionsAsync(1000000);

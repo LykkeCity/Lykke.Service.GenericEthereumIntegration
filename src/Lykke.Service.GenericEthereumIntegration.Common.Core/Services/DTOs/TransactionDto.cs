@@ -21,6 +21,6 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Core.Services.DTOs
 
         public bool TransactionIsInternal { get; set; }
 
-        public DateTime TransactionTimestamp { get; set; }
+        public BigInteger TransactionTimestamp { get; set; }
     }
 }

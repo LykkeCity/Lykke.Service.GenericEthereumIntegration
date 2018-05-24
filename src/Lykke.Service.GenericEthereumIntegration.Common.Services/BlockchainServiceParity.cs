@@ -63,30 +63,72 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Services
             
             #endregion
             
-            var blocks = _web3Parity.Eth.Blocks;
-            var block = await blocks.GetBlockWithTransactionsByNumber.SendRequestAsync(new HexBigInteger(blockNumber));
+            var hexBlockNumber = new HexBigInteger(blockNumber);
+            var block = await _web3Parity.Eth.Blocks.GetBlockWithTransactionsByNumber.SendRequestAsync(hexBlockNumber);
 
-            var transactions = new List<TransactionDto>();
-
-            foreach (var transaction in block.Transactions)
-            {
-                var transferActions = (await GetTransactionTracesAsync(transaction.TransactionHash))
-                    .Skip(1)
-                    // TODO: Ensure, that it is correct
-                    .Where(x => new HexBigInteger(x.Action.Value) != new BigInteger(0))
-                    .Where(x => x.Action.CallType == "call")
-                    .Select(x => x.Action)
-                    .Select(x => new TransactionDto
-                    {
-                        FromAddress = x.From,
-                        ToAddress = x.To,
-                        TransactionAmount = new HexBigInteger(x.Value).Value 
-                    });
-
+            var transactionsWithTraces = await Task.WhenAll
+            (
                 
+                block.Transactions.Select(async x => new
+                {
+                    Transaction = x,
+                    TransactionTraces = await GetTransactionTracesAsync(x.TransactionHash)
+                })
+                
+            );
+
+
+            IEnumerable<TransactionDto> BuildResult()
+            {
+                foreach (var transactionWithTraces in transactionsWithTraces)
+                {
+                    var transaction = transactionWithTraces.Transaction;
+                    var traces = transactionWithTraces.TransactionTraces;
+
+                    if (transaction.Value != BigInteger.Zero)
+                    {
+                        var transactionError = traces[0].Error;
+                        
+                        yield return new TransactionDto
+                        {
+                            FromAddress = AddressChecksum.Encode(transaction.From),
+                            ToAddress = AddressChecksum.Encode(transaction.To),
+                            TransactionAmount = transaction.Value,
+                            TransactionError = transactionError,
+                            TransactionFailed = transactionError.IsNotNullOrEmpty(),
+                            TransactionHash = transaction.TransactionHash,
+                            TransactionIndex = transaction.TransactionIndex,
+                            TransactionIsInternal = false,
+                            TransactionTimestamp = block.Timestamp
+                        };
+                    }
+
+                    for (var i = 1; i < traces.Length; i++)
+                    {
+                        var trace = traces[i];
+                        var traceActionValue = new HexBigInteger(trace.Action.Value);
+                        
+                        if (trace.Action.CallType == "call" && traceActionValue != BigInteger.Zero)
+                        {
+                            yield return new TransactionDto
+                            {
+                                FromAddress = AddressChecksum.Encode(trace.Action.From),
+                                ToAddress = AddressChecksum.Encode(trace.Action.To),
+                                TransactionAmount = traceActionValue,
+                                TransactionError = trace.Error,
+                                TransactionFailed = trace.Error.IsNotNullOrEmpty(),
+                                TransactionHash = transaction.TransactionHash,
+                                TransactionIndex = transaction.TransactionIndex,
+                                TransactionIsInternal = true,
+                                TransactionTimestamp = block.Timestamp
+                            };                            
+                        }
+                    }
+                }
             }
 
-            return transactions;
+            
+            return BuildResult();
         }
 
         /// <inheritdoc />
@@ -113,11 +155,12 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Services
                 .Where(x => x.IsNotNullOrEmpty());
         }
 
-        private async Task<IEnumerable<TransactionTrace>> GetTransactionTracesAsync(string txHash)
+        private async Task<TransactionTrace[]> GetTransactionTracesAsync(string txHash)
         {
             var request = new RpcRequest($"{Guid.NewGuid()}", "trace_transaction", txHash);
 
-            return await _web3Parity.Client.SendRequestAsync<IEnumerable<TransactionTrace>>(request);
+            return (await _web3Parity.Client.SendRequestAsync<IEnumerable<TransactionTrace>>(request))
+                .ToArray();
         }
     }
 }

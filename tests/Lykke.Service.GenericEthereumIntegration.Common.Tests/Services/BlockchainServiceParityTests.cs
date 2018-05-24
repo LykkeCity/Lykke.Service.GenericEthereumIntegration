@@ -215,6 +215,12 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
         }
 
         [TestMethod]
+        public override async Task GetTransactionsAsync__BlockIsNotEmpty__ValidTransactionListReturned()
+        {
+            await base.GetTransactionsAsync__BlockIsNotEmpty__ValidTransactionListReturned();
+        }
+
+        [TestMethod]
         public override async Task GetTransactionsAsync__BlockIsEmpty__EmptyTransactionListReturned()
         {
             await base.GetTransactionsAsync__BlockIsEmpty__EmptyTransactionListReturned();
