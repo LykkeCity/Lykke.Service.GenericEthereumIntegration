@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Lykke.Service.GenericEthereumIntegration.Api.Core.Services.Interfaces;
+using Lykke.Service.GenericEthereumIntegration.Common.Core.Exceptions;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Services.Extensions;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Services.Interfaces;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Utils;
@@ -25,9 +26,9 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
         {
             #region Validation
             
-            if (string.IsNullOrEmpty(address))
+            if (address.IsNullOrEmpty())
             {
-                throw new ArgumentException("Should not be null or empty.", nameof(address));
+                throw new ArgumentException(CommonExceptionMessages.ShouldNotBeNullOrEmpty, nameof(address));
             }
             
             #endregion

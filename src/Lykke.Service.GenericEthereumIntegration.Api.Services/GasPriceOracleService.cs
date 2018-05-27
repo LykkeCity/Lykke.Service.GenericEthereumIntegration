@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Lykke.Service.GenericEthereumIntegration.Api.Core.Repositories.Interfaces;
 using Lykke.Service.GenericEthereumIntegration.Api.Core.Services.Interfaces;
 using Lykke.Service.GenericEthereumIntegration.Api.Core.Settings.Service;
+using Lykke.Service.GenericEthereumIntegration.Common.Core.Exceptions;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Services.Interfaces;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Utils;
 
@@ -33,19 +34,19 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
         {
             #region Validation
             
-            if (string.IsNullOrEmpty(to))
+            if (to.IsNullOrEmpty())
             {
-                throw new ArgumentException("Should not be null or empty.", nameof(to));
+                throw new ArgumentException(CommonExceptionMessages.ShouldNotBeNullOrEmpty, nameof(to));
             }
 
-            if (!AddressChecksum.ValidateAsync(to).Result)
+            if (!await AddressChecksum.ValidateAsync(to))
             {
-                throw new ArgumentException("Should be a valid address.", nameof(to));
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeValidAddress, nameof(to));
             }
 
             if (amount <= 0)
             {
-                throw new ArgumentException("Should be greater than zero.", nameof(amount));
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeGreaterThanZero, nameof(amount));
             }
             
             #endregion

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
@@ -92,6 +93,8 @@ namespace Lykke.Service.GenericEthereumIntegration.Worker.Actors.Roles
         {
             foreach (var transaction in transactions)
             {
+                var transactionTimestamp = DateTimeOffset.FromUnixTimeSeconds((long) transaction.TransactionTimestamp);
+                
                 await _historicalTransactionRepository.InsertOrReplaceAsync(new HistoricalTransactionDto
                 {
                     FromAddress = transaction.FromAddress,
@@ -101,7 +104,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Worker.Actors.Roles
                     TransactionFailed = transaction.TransactionFailed,
                     TransactionHash = transaction.TransactionHash,
                     TransactionIndex = transaction.TransactionIndex,
-                    TransactionTimestamp = transaction.TransactionTimestamp
+                    TransactionTimestamp = transactionTimestamp.DateTime
                 });
             }
         }

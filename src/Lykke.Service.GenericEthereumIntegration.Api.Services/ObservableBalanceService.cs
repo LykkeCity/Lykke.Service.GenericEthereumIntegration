@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Lykke.Service.GenericEthereumIntegration.Api.Core.Exceptions;
 using Lykke.Service.GenericEthereumIntegration.Api.Core.Services.Interfaces;
+using Lykke.Service.GenericEthereumIntegration.Common.Core.Exceptions;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Repositories.DTOs;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Repositories.Interfaces;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Settings.Integration;
@@ -32,7 +33,15 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
         {
             #region Validation
             
-            await ValidateInputParameterAsync(address);
+            if (string.IsNullOrEmpty(address))
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldNotBeNullOrEmpty, nameof(address));
+            }
+
+            if (!await AddressChecksum.ValidateAsync(address))
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeValidAddress, nameof(address));
+            }
             
             #endregion
             
@@ -48,7 +57,15 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
         {
             #region Validation
             
-            await ValidateInputParameterAsync(address);
+            if (string.IsNullOrEmpty(address))
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldNotBeNullOrEmpty, nameof(address));
+            }
+
+            if (!await AddressChecksum.ValidateAsync(address))
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeValidAddress, nameof(address));
+            }
             
             #endregion
             
@@ -66,7 +83,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
             
             if (take <= 0)
             {
-                throw new ArgumentException("Should be greater than zero.", nameof(take));
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeGreaterThanZero, nameof(take));
             }
             
             #endregion
@@ -76,19 +93,6 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
             (balances, continuationToken) = await _observableBalanceRepository.GetAllWithNonZeroAmountAsync(take, continuationToken);
 
             return (balances, _assetSettings.Id, continuationToken);
-        }
-        
-        private async Task ValidateInputParameterAsync(string address)
-        {
-            if (string.IsNullOrEmpty(address))
-            {
-                throw new ArgumentException("Should not be null or empty.", nameof(address));
-            }
-
-            if (await AddressChecksum.ValidateAsync(address))
-            {
-                throw new ArgumentException("Should be a valid address.", nameof(address));
-            }
         }
     }
 }

@@ -11,6 +11,6 @@
     <PackageReference Include="Autofac" Version="4.8.1" />
     <PackageReference Include="JetBrains.Annotations" Version="11.1.0" />
     <PackageReference Include="Lykke.AzureStorage" Version="8.4.0" />
-    <PackageReference Include="Lykke.Common" Version="6.7.0" />
+    <PackageReference Include="Lykke.Common" Version="6.8.2" />
   </ItemGroup>
 </Project>

@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 using Lykke.Service.GenericEthereumIntegration.Api.Core.Exceptions;
 using Lykke.Service.GenericEthereumIntegration.Api.Core.Services.Interfaces;
+using Lykke.Service.GenericEthereumIntegration.Common.Core.Exceptions;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Services.DTOs;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Settings.Integration;
+using Lykke.Service.GenericEthereumIntegration.Common.Core.Utils;
 
 
 namespace Lykke.Service.GenericEthereumIntegration.Api.Services
@@ -35,9 +37,9 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
         {
             #region Validation
             
-            if (string.IsNullOrEmpty(assetId))
+            if (assetId.IsNullOrEmpty())
             {
-                throw new ArgumentException("Should not be null or empty.", nameof(assetId));
+                throw new ArgumentException(CommonExceptionMessages.ShouldNotBeNullOrEmpty, nameof(assetId));
             }
             
             #endregion

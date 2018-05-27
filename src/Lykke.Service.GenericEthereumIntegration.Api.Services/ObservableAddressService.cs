@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Lykke.Service.GenericEthereumIntegration.Api.Core.Exceptions;
 using Lykke.Service.GenericEthereumIntegration.Api.Core.Services.Interfaces;
+using Lykke.Service.GenericEthereumIntegration.Common.Core.Exceptions;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Repositories.Interfaces;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Utils;
 
@@ -25,7 +26,15 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
         {
             #region Validation
             
-            await ValidateInputParameterAsync(address);
+            if (address.IsNullOrEmpty())
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldNotBeNullOrEmpty, nameof(address));
+            }
+
+            if (!await AddressChecksum.ValidateAsync(address))
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeValidAddress, nameof(address));
+            }
             
             #endregion
             
@@ -41,7 +50,15 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
         {
             #region Validation
             
-            await ValidateInputParameterAsync(address);
+            if (address.IsNullOrEmpty())
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldNotBeNullOrEmpty, nameof(address));
+            }
+
+            if (!await AddressChecksum.ValidateAsync(address))
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeValidAddress, nameof(address));
+            }
             
             #endregion
             
@@ -57,7 +74,15 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
         {
             #region Validation
             
-            await ValidateInputParameterAsync(address);
+            if (address.IsNullOrEmpty())
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldNotBeNullOrEmpty, nameof(address));
+            }
+
+            if (!await AddressChecksum.ValidateAsync(address))
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeValidAddress, nameof(address));
+            }
             
             #endregion
             
@@ -73,7 +98,15 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
         {
             #region Validation
             
-            await ValidateInputParameterAsync(address);
+            if (address.IsNullOrEmpty())
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldNotBeNullOrEmpty, nameof(address));
+            }
+
+            if (!await AddressChecksum.ValidateAsync(address))
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeValidAddress, nameof(address));
+            }
             
             #endregion
             
@@ -83,19 +116,6 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
             }
 
             throw new ConflictException($"Specified address [{address}] has already bbeen added to the outgoing observation list.");
-        }
-
-        private async Task ValidateInputParameterAsync(string address)
-        {
-            if (string.IsNullOrEmpty(address))
-            {
-                throw new ArgumentException("Should not be null or empty.", nameof(address));
-            }
-
-            if (await AddressChecksum.ValidateAsync(address))
-            {
-                throw new ArgumentException("Should be a valid address.", nameof(address));
-            }
         }
     }
 }

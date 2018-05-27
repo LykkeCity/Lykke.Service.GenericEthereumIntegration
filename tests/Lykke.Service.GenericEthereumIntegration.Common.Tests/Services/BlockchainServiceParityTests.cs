@@ -22,130 +22,95 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
         protected override string RpcHostUrlKey
             => "RopstenParityRpcHostUrl";
 
+        
         [TestMethod]
-        public override void BuildTransaction__ValidParametersPassed__TransactionBuilt()
+        public override void BuildTransaction__ValidArgumentsPassed__TransactionBuilt()
         {
-            base.BuildTransaction__ValidParametersPassed__TransactionBuilt();
+            base.BuildTransaction__ValidArgumentsPassed__TransactionBuilt();
+        }
+        
+        [DataTestMethod]
+        [DataRow(null, 1, 0, 1, 1)]                                             // to is null
+        [DataRow("",   1, 0, 1, 1)]                                             // to is empty
+        [DataRow("0xea674fdDe714fd979de3EdF0F56AA9716B898ec8",  1,  0,  1,  1)] // to is invalid
+        [DataRow("0xEA674fdDe714fd979de3EdF0F56AA9716B898ec8",  0,  0,  1,  1)] // amount == 0
+        [DataRow("0xEA674fdDe714fd979de3EdF0F56AA9716B898ec8", -1,  0,  1,  1)] // amount < 0
+        [DataRow("0xEA674fdDe714fd979de3EdF0F56AA9716B898ec8",  1, -1,  1,  1)] // none < 0
+        [DataRow("0xEA674fdDe714fd979de3EdF0F56AA9716B898ec8",  1,  0,  0,  1)] // gasPrice == 0
+        [DataRow("0xEA674fdDe714fd979de3EdF0F56AA9716B898ec8",  1,  0, -1,  1)] // gasPrice < 0
+        [DataRow("0xEA674fdDe714fd979de3EdF0F56AA9716B898ec8",  1,  0,  1,  0)] // gasAmount == 0
+        [DataRow("0xEA674fdDe714fd979de3EdF0F56AA9716B898ec8",  1,  0,  1, -1)] // gasAmount < 0
+        public override void BuildTransaction__IncalidArgumentsPassed__ExceptionThrown(string to, int amount, int nonce, int gasPrice, int gasAmount)
+        {
+            base.BuildTransaction__IncalidArgumentsPassed__ExceptionThrown(to, amount, nonce, gasPrice, gasAmount);
+        }
+        
+        [DataTestMethod]
+        [DataRow(null)]
+        [DataRow("")]
+        [DataRow("0xA")]
+        [DataRow("0xZe")]
+        public override async Task CheckIfBroadcastedAsync__InvalidArgumentsPassed__ExceptionThrown(string txHash)
+        {
+            await base.CheckIfBroadcastedAsync__InvalidArgumentsPassed__ExceptionThrown(txHash);
         }
 
         [TestMethod]
-        public override void BuildTransaction__ToAddressIsNullOrEmpty__ExceptionThrown()
+        public override async Task EstimateGasPriceAsync__ValidArgumentsPassed__TransactionBuilt()
         {
-            base.BuildTransaction__ToAddressIsNullOrEmpty__ExceptionThrown();
+            await base.EstimateGasPriceAsync__ValidArgumentsPassed__TransactionBuilt();
+        }
+
+        [DataTestMethod]
+        [DataRow(null, 1)]                                          // to is null
+        [DataRow("",   1)]                                          // to is empty
+        [DataRow("0xea674fdDe714fd979de3EdF0F56AA9716B898ec8",  1)] // to is invalid
+        [DataRow("0xEA674fdDe714fd979de3EdF0F56AA9716B898ec8",  0)] // amount == 0
+        [DataRow("0xEA674fdDe714fd979de3EdF0F56AA9716B898ec8", -1)] // amount < 0
+        public override async Task EstimateGasPriceAsync__InvalidArgumentsPassed__ExceptionThrown(string to, int amount)
+        {
+            await base.EstimateGasPriceAsync__InvalidArgumentsPassed__ExceptionThrown(to, amount);
+        }
+        
+        [TestMethod]
+        public override async Task GetBalanceAsync__ValidArgumentsPassed_And_BlockExists__ValidBalanceReturned()
+        {
+            await base.GetBalanceAsync__ValidArgumentsPassed_And_BlockExists__ValidBalanceReturned();
         }
 
         [TestMethod]
-        public override void BuildTransaction__ToAddressIsInvalid__ExceptionThrown()
+        public override async Task GetBalanceAsync__ValidArgumentsPassed_And_BlockDoesNotExist__ExceptionThrown()
         {
-            base.BuildTransaction__ToAddressIsInvalid__ExceptionThrown();
+            await base.GetBalanceAsync__ValidArgumentsPassed_And_BlockDoesNotExist__ExceptionThrown();
+        }
+
+        [DataTestMethod]
+        [DataRow(null, 1)]                                          // address is null
+        [DataRow("",   1)]                                          // address is empty
+        [DataRow("0xea674fdDe714fd979de3EdF0F56AA9716B898ec8",  1)] // address is invalid
+        [DataRow("0xEA674fdDe714fd979de3EdF0F56AA9716B898ec8", -1)] // blockNumber < 0
+        public override async Task GetBalanceAsync__InvalidArguemtnsPassed__ExceptionThrown(string address, int blockNumber)
+        {
+            await base.GetBalanceAsync__InvalidArguemtnsPassed__ExceptionThrown(address, blockNumber);
         }
 
         [TestMethod]
-        public override void BuildTransaction__AmounIsLowerOrEqualToZero__ExceptionThrown()
+        public override async Task GetBlockHashAsync__ValidArgumentsPassed_And_BlockExists__ValidBlockHashReturned()
         {
-            base.BuildTransaction__AmounIsLowerOrEqualToZero__ExceptionThrown();
+            await base.GetBlockHashAsync__ValidArgumentsPassed_And_BlockExists__ValidBlockHashReturned();
         }
 
         [TestMethod]
-        public override void BuildTransaction__NonceIsLowerThanZero__ExceptionThrown()
+        public override async Task GetBlockHashAsync__ValidArgumentsPassed_And_BlockDoesNotExist__ExceptionThrown()
         {
-            base.BuildTransaction__NonceIsLowerThanZero__ExceptionThrown();
+            await base.GetBlockHashAsync__ValidArgumentsPassed_And_BlockDoesNotExist__ExceptionThrown();
         }
 
-        [TestMethod]
-        public override void BuildTransaction__GasPriceIsLowerOrEqualToZero__ExceptionThrown()
+        [DataTestMethod]
+        [DataRow(-1)] // blockNumber < 0
+        public override async Task GetBlockHashAsync__InvalidArgumentsPassed__ExceptionThrown(int blockNumber)
         {
-            base.BuildTransaction__GasPriceIsLowerOrEqualToZero__ExceptionThrown();
-        }
-
-        [TestMethod]
-        public override void BuildTransaction__GasAmountIsLowerOrEqualToZero__ExceptionThrown()
-        {
-            base.BuildTransaction__GasAmountIsLowerOrEqualToZero__ExceptionThrown();
-        }
-
-        [TestMethod]
-        public override async Task CheckIfBroadcastedAsync__TxHashIsNullOrEmpty__ExceptionThrown()
-        {
-            await base.CheckIfBroadcastedAsync__TxHashIsNullOrEmpty__ExceptionThrown();
-        }
-
-        [TestMethod]
-        public override async Task CheckIfBroadcastedAsync__TxHashIsNotHexString__ExceptionThrown()
-        {
-            await base.CheckIfBroadcastedAsync__TxHashIsNotHexString__ExceptionThrown();
-        }
-
-        [TestMethod]
-        public override async Task EstimateGasPriceAsync__ValidParametersPassed__TransactionBuilt()
-        {
-            await base.EstimateGasPriceAsync__ValidParametersPassed__TransactionBuilt();
-        }
-
-        [TestMethod]
-        public override async Task EstimateGasPriceAsync__ToAddressIsNullOrEmpty__ExceptionThrown()
-        {
-            await base.EstimateGasPriceAsync__ToAddressIsNullOrEmpty__ExceptionThrown();
-        }
-
-        [TestMethod]
-        public override async Task EstimateGasPriceAsync__ToAddressIsInvalid__ExceptionThrown()
-        {
-            await base.EstimateGasPriceAsync__ToAddressIsInvalid__ExceptionThrown();
-        }
-
-        [TestMethod]
-        public override async Task EstimateGasPriceAsync__AmounIsLowerOrEqualToZero__ExceptionThrown()
-        {
-            await base.EstimateGasPriceAsync__AmounIsLowerOrEqualToZero__ExceptionThrown();
-        }
-
-        [TestMethod]
-        public override async Task GetBalanceAsync__ValidParametersPassed_And_BlockExists__ValidBalanceReturned()
-        {
-            await base.GetBalanceAsync__ValidParametersPassed_And_BlockExists__ValidBalanceReturned();
-        }
-
-        [TestMethod]
-        public override async Task GetBalanceAsync__ValidParametersPassed_And_BlockDoesNotExist__ExceptionThrown()
-        {
-            await base.GetBalanceAsync__ValidParametersPassed_And_BlockDoesNotExist__ExceptionThrown();
-        }
-
-        [TestMethod]
-        public override async Task GetBalanceAsync__AddressIsNullOrEmpty__ExceptionThrown()
-        {
-            await base.GetBalanceAsync__AddressIsNullOrEmpty__ExceptionThrown();
-        }
-
-        [TestMethod]
-        public override async Task GetBalanceAsync__AddressIsInvalid__ExceptionThrown()
-        {
-            await base.GetBalanceAsync__AddressIsInvalid__ExceptionThrown();
-        }
-
-        [TestMethod]
-        public override async Task GetBalanceAsync__BlockNumberIsLowerThanZero__ExceptionThrown()
-        {
-            await base.GetBalanceAsync__BlockNumberIsLowerThanZero__ExceptionThrown();
-        }
-
-        [TestMethod]
-        public override async Task GetBlockHashAsync__ValidParametersPassed_And_BlockExists__ValidBlockHashReturned()
-        {
-            await base.GetBlockHashAsync__ValidParametersPassed_And_BlockExists__ValidBlockHashReturned();
-        }
-
-        [TestMethod]
-        public override async Task GetBlockHashAsync__ValidParametersPassed_And_BlockDoesNotExist__ExceptionThrown()
-        {
-            await base.GetBlockHashAsync__ValidParametersPassed_And_BlockDoesNotExist__ExceptionThrown();
-        }
-
-        [TestMethod]
-        public override async Task GetBlockHashAsync__BlockNumberIsLowerThanZero__ExceptionThrown()
-        {
-            await base.GetBlockHashAsync__BlockNumberIsLowerThanZero__ExceptionThrown();
+            await base.GetBlockHashAsync__InvalidArgumentsPassed__ExceptionThrown(blockNumber);
         }
 
         [TestMethod]
@@ -160,16 +125,13 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             await base.GetCodeAsync__AddressIsContract__ValidCodeReturned();
         }
 
-        [TestMethod]
-        public override async Task GetCodeAsync__AddressIsNullOrEmpty__ExceptionThrown()
+        [DataTestMethod]
+        [DataRow(null)]                                         // address is null
+        [DataRow("")]                                           // address is empty
+        [DataRow("0xea674fdDe714fd979de3EdF0F56AA9716B898ec8")] // address is invalid
+        public override async Task GetCodeAsync__InvalidArgumentsPassed__ExceptionThrown(string address)
         {
-            await base.GetCodeAsync__AddressIsNullOrEmpty__ExceptionThrown();
-        }
-
-        [TestMethod]
-        public override async Task GetCodeAsync__AddressIsInvalid__ExceptionThrown()
-        {
-            await base.GetCodeAsync__AddressIsInvalid__ExceptionThrown();
+            await base.GetCodeAsync__InvalidArgumentsPassed__ExceptionThrown(address);
         }
 
         [TestMethod]
@@ -179,21 +141,22 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
         }
 
         [TestMethod]
-        public override async Task GetTimestampAsync__BlockExists__ValidTimestampReturned()
+        public override async Task GetTimestampAsync__ValidArgumentsPassed_And_BlockExists__ValidTimestampReturned()
         {
-            await base.GetTimestampAsync__BlockExists__ValidTimestampReturned();
+            await base.GetTimestampAsync__ValidArgumentsPassed_And_BlockExists__ValidTimestampReturned();
         }
 
         [TestMethod]
-        public override async Task GetTimestampAsync__BlockDoesNotExist__ValidTimestampReturned()
+        public override async Task GetTimestampAsync__ValidArgumentsPassed_And_BlockDoesNotExist__ExceptionThrown()
         {
-            await base.GetTimestampAsync__BlockDoesNotExist__ValidTimestampReturned();
+            await base.GetTimestampAsync__ValidArgumentsPassed_And_BlockDoesNotExist__ExceptionThrown();
         }
 
-        [TestMethod]
-        public override async Task GetTimestampAsync__BlockNumberIsLowerThanZero__ExceptionThrown()
+        [DataTestMethod]
+        [DataRow(-1)] // blockNumber < 0
+        public override async Task GetTimestampAsync__InvalidArgumentsPassed__ExceptionThrown(int blockNumber)
         {
-            await base.GetTimestampAsync__BlockNumberIsLowerThanZero__ExceptionThrown();
+            await base.GetTimestampAsync__InvalidArgumentsPassed__ExceptionThrown(blockNumber);
         }
 
         [TestMethod]
@@ -201,17 +164,15 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
         {
             base.GetTransactionHash__ValidTransactionDataPassed__ValidTransactionHashReturned();
         }
-
-        [TestMethod]
-        public override void GetTransactionHash__TransactionDataIsNullOrEmpty__ExceptionThrown()
+        
+        [DataTestMethod]
+        [DataRow(null)]
+        [DataRow("")]
+        [DataRow("0xA")]
+        [DataRow("0xZe")]
+        public override void GetTransactionHash__InvalidArgumentsPassed__ExceptionThrown(string txData)
         {
-            base.GetTransactionHash__TransactionDataIsNullOrEmpty__ExceptionThrown();
-        }
-
-        [TestMethod]
-        public override void GetTransactionHash__TransactionDataIsNotHexString__ExceptionThrown()
-        {
-            base.GetTransactionHash__TransactionDataIsNotHexString__ExceptionThrown();
+            base.GetTransactionHash__InvalidArgumentsPassed__ExceptionThrown(txData);
         }
 
         [TestMethod]
@@ -226,76 +187,72 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             await base.GetTransactionsAsync__BlockIsEmpty__EmptyTransactionListReturned();
         }
 
-        [TestMethod]
-        public override async Task GetTransactionsAsync__BlockNumberIsLowerThanZero__ExceptionThrown()
+        [DataTestMethod]
+        [DataRow(-1)] // blockNumber < 0
+        public override async Task GetTransactionsAsync__InvalidArgumentsPassed__ExceptionThrown(int blockNumber)
         {
-            await base.GetTransactionsAsync__BlockNumberIsLowerThanZero__ExceptionThrown();
+            await base.GetTransactionsAsync__InvalidArgumentsPassed__ExceptionThrown(blockNumber);
+        }
+
+
+        [TestMethod]
+        public override void GetTransactionSigner__ValidArgumentsPassed__ValidTransactionSignerReturned()
+        {
+            base.GetTransactionSigner__ValidArgumentsPassed__ValidTransactionSignerReturned();
+        }
+
+        [DataTestMethod]
+        [DataRow(null)]
+        [DataRow("")]
+        [DataRow("0xA")]
+        [DataRow("0xZe")]
+        public override void GetTransactionSigner__InvalidArgumentsPassed__ExceptionThrown(string signedTxData)
+        {
+            base.GetTransactionSigner__InvalidArgumentsPassed__ExceptionThrown(signedTxData);
         }
 
         [TestMethod]
-        public override void GetTransactionSigner__ValidTransactionDataPassed__ValidTransactionSignerReturned()
+        public override void GetTransactionSigner__TransactionHasNotBeenSigned__ExceptionThrown()
         {
-            base.GetTransactionSigner__ValidTransactionDataPassed__ValidTransactionSignerReturned();
+            base.GetTransactionSigner__TransactionHasNotBeenSigned__ExceptionThrown();
+        }
+
+        [DataTestMethod]
+        [DataRow(null)]
+        [DataRow("")]
+        [DataRow("0xA")]
+        [DataRow("0xZe")]
+        public override async Task SendRawTransactionAsync__InvalidArgumentsPassed__ExceptionThrown(string signedTxData)
+        {
+            await base.SendRawTransactionAsync__InvalidArgumentsPassed__ExceptionThrown(signedTxData);
         }
 
         [TestMethod]
-        public override void GetTransactionSigner__TransactionDataIsNullOrEmpty__ExceptionThrown()
+        public override async Task TryGetTransactionErrorAsync__TransactionIsFailed__ValidErrorListReturned()
         {
-            base.GetTransactionSigner__TransactionDataIsNullOrEmpty__ExceptionThrown();
+            await base.TryGetTransactionErrorAsync__TransactionIsFailed__ValidErrorListReturned();
         }
 
         [TestMethod]
-        public override void GetTransactionSigner__TransactionDataIsNotHexString__ExceptionThrown()
+        public override async Task TryGetTransactionErrorAsync__TransactionIsSuccessful__EmptyErrorListReturned()
         {
-            base.GetTransactionSigner__TransactionDataIsNotHexString__ExceptionThrown();
+            await base.TryGetTransactionErrorAsync__TransactionIsSuccessful__EmptyErrorListReturned();
         }
 
         [TestMethod]
-        public override void GetTransactionSigner__TransactionHasNotBeenSigned__EWxceptionThrown()
+        public override async Task TryGetTransactionErrorAsync__TransactionDoesNotExist__NullReturned()
         {
-            base.GetTransactionSigner__TransactionHasNotBeenSigned__EWxceptionThrown();
+            await base.TryGetTransactionErrorAsync__TransactionDoesNotExist__NullReturned();
         }
 
-        [TestMethod]
-        public override async Task SendRawTransactionAsync__TxHashIsNullOrEmpty__ExceptionThrown()
+        [DataTestMethod]
+        [DataRow(null)]
+        [DataRow("")]
+        [DataRow("0xA")]
+        [DataRow("0xZe")]
+        public override async Task TryGetTransactionErrorAsync__InvalidArgumentsPassed__ExceptionThrown(string txHash)
         {
-            await base.SendRawTransactionAsync__TxHashIsNullOrEmpty__ExceptionThrown();
-        }
-
-        [TestMethod]
-        public override async Task SendRawTransactionAsync__TxHashIsNotHexString__ExceptionThrown()
-        {
-            await base.SendRawTransactionAsync__TxHashIsNotHexString__ExceptionThrown();
-        }
-
-        [TestMethod]
-        public override async Task TryGetTransactionErrorAsync__FailedTxHashPassed__ValidErrorListReturned()
-        {
-            await base.TryGetTransactionErrorAsync__FailedTxHashPassed__ValidErrorListReturned();
-        }
-
-        [TestMethod]
-        public override async Task TryGetTransactionErrorAsync__SuccessfulTxHashPassed__EmptyErrorListReturned()
-        {
-            await base.TryGetTransactionErrorAsync__SuccessfulTxHashPassed__EmptyErrorListReturned();
-        }
-
-        [TestMethod]
-        public override async Task TryGetTransactionErrorAsync__NonExistingTxHashPassed__NullReturned()
-        {
-            await base.TryGetTransactionErrorAsync__NonExistingTxHashPassed__NullReturned();
-        }
-
-        [TestMethod]
-        public override async Task TryGetTransactionErrorAsync__TransactionHashIsNullOrEmpty__ExceptionThrown()
-        {
-            await base.TryGetTransactionErrorAsync__TransactionHashIsNullOrEmpty__ExceptionThrown();
-        }
-
-        [TestMethod]
-        public override async Task TryGetTransactionErrorAsync__TransactionHashIsNotHexString__ExceptionThrown()
-        {
-            await base.TryGetTransactionErrorAsync__TransactionHashIsNotHexString__ExceptionThrown();
+            await base.TryGetTransactionErrorAsync__InvalidArgumentsPassed__ExceptionThrown(txHash);
         }
 
         [TestMethod]
@@ -310,34 +267,30 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             await base.TryGetTransactionReceiptAsync__NonExistingTxHashPassed__NullReturned();
         }
 
-        [TestMethod]
-        public override async Task TryGetTransactionReceiptAsync__TransactionHashIsNullOrEmpty__ExceptionThrown()
+        [DataTestMethod]
+        [DataRow(null)]
+        [DataRow("")]
+        [DataRow("0xA")]
+        [DataRow("0xZe")]
+        public override async Task TryGetTransactionReceiptAsync__InvalidArgumentsPassed__ExceptionThrown(string txHash)
         {
-            await base.TryGetTransactionReceiptAsync__TransactionHashIsNullOrEmpty__ExceptionThrown();
+            await base.TryGetTransactionReceiptAsync__InvalidArgumentsPassed__ExceptionThrown(txHash);
         }
 
         [TestMethod]
-        public override async Task TryGetTransactionReceiptAsync__TransactionHashIsNotHexString__ExceptionThrown()
+        public override async Task UnsignTransactionAsync__ValidArgumentsPassed__ValidUnsignedTxDataReturned()
         {
-            await base.TryGetTransactionReceiptAsync__TransactionHashIsNotHexString__ExceptionThrown();
+            await base.UnsignTransactionAsync__ValidArgumentsPassed__ValidUnsignedTxDataReturned();
         }
 
-        [TestMethod]
-        public override async Task UnsignTransactionAsync__ValidSignedTxDataPassed__ValidUnsignedTxDataReturned()
+        [DataTestMethod]
+        [DataRow(null)]
+        [DataRow("")]
+        [DataRow("0xA")]
+        [DataRow("0xZe")]
+        public override async Task UnsignTransactionAsync__InvalidArgumentsPassed__ExceptionThrown(string signedTxData)
         {
-            await base.UnsignTransactionAsync__ValidSignedTxDataPassed__ValidUnsignedTxDataReturned();
-        }
-
-        [TestMethod]
-        public override async Task UnsignTransactionAsync__TxHashIsNullOrEmpty__ExceptionThrown()
-        {
-            await base.UnsignTransactionAsync__TxHashIsNullOrEmpty__ExceptionThrown();
-        }
-
-        [TestMethod]
-        public override async Task UnsignTransactionAsync__TxHashIsNotHexString__ExceptionThrown()
-        {
-            await base.UnsignTransactionAsync__TxHashIsNotHexString__ExceptionThrown();
+            await base.UnsignTransactionAsync__InvalidArgumentsPassed__ExceptionThrown(signedTxData);
         }
 
         [TestMethod]

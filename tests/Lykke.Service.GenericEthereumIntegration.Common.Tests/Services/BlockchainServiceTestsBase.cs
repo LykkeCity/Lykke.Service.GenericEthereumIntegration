@@ -39,120 +39,28 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
         
         #region BuildTransaction
         
-        private string BuildTransaction(
-            string to = "0xEA674fdDe714fd979de3EdF0F56AA9716B898ec8",
-            int amount = 2, 
-            int nonce = 0,
-            int gasPrice = 2,
-            int gasAmount = 2)
+        public virtual void BuildTransaction__ValidArgumentsPassed__TransactionBuilt()
         {
-            return BlockchainService.BuildTransaction(to, amount, nonce, gasPrice, gasAmount);
-        }
-        
-        
-        public virtual void BuildTransaction__ValidParametersPassed__TransactionBuilt()
-        {
-            var actualResult = BuildTransaction();
+            var actualResult = BlockchainService.BuildTransaction("0xEA674fdDe714fd979de3EdF0F56AA9716B898ec8", 2, 0, 2, 2);;
 
             Assert.AreEqual("0xdd80020294ea674fdde714fd979de3edf0f56aa9716b898ec80280808080", actualResult);
         }
         
-        public virtual void BuildTransaction__ToAddressIsNullOrEmpty__ExceptionThrown()
+        public virtual void BuildTransaction__IncalidArgumentsPassed__ExceptionThrown(string to, int amount, int nonce, int gasPrice, int gasAmount)
         {
-            Assert.ThrowsException<ArgumentException>
-            (
-                () => BuildTransaction(to: null)
-            );
             
-            Assert.ThrowsException<ArgumentException>
-            (
-                () => BuildTransaction(to: "")
-            );
-        }
-        
-        public virtual void BuildTransaction__ToAddressIsInvalid__ExceptionThrown()
-        {
-            Assert.ThrowsException<ArgumentException>
-            (
-                () => BuildTransaction(to: "0xea674fdDe714fd979de3EdF0F56AA9716B898ec8")
-            );
-        }
-        
-        public virtual void BuildTransaction__AmounIsLowerOrEqualToZero__ExceptionThrown()
-        {
-            Assert.ThrowsException<ArgumentException>
-            (
-                () => BuildTransaction(amount: 0)
-            );
-            
-            Assert.ThrowsException<ArgumentException>
-            (
-                () => BuildTransaction(amount: -1)
-            );
-        }
-        
-        public virtual void BuildTransaction__NonceIsLowerThanZero__ExceptionThrown()
-        {
-            Assert.ThrowsException<ArgumentException>
-            (
-                () => BuildTransaction(nonce: -1)
-            );
-        }
-        
-        public virtual void BuildTransaction__GasPriceIsLowerOrEqualToZero__ExceptionThrown()
-        {
-            Assert.ThrowsException<ArgumentException>
-            (
-                () => BuildTransaction(gasPrice: 0)
-            );
-            
-            Assert.ThrowsException<ArgumentException>
-            (
-                () => BuildTransaction(gasPrice: -1)
-            );
-        }
-        
-        public virtual void BuildTransaction__GasAmountIsLowerOrEqualToZero__ExceptionThrown()
-        {
-            Assert.ThrowsException<ArgumentException>
-            (
-                () => BuildTransaction(gasAmount: 0)
-            );
-            
-            Assert.ThrowsException<ArgumentException>
-            (
-                () => BuildTransaction(gasAmount: -1)
-            );
         }
         
         #endregion
 
         #region CheckIfBroadcastedAsync
 
-        public virtual async Task CheckIfBroadcastedAsync__TxHashIsNullOrEmpty__ExceptionThrown()
+        public virtual async Task CheckIfBroadcastedAsync__InvalidArgumentsPassed__ExceptionThrown(string txHash)
         {
             await Assert.ThrowsExceptionAsync<ArgumentException>
             (
                 // ReSharper disable once AssignNullToNotNullAttribute
-                () => BlockchainService.CheckIfBroadcastedAsync(null)
-            );
-            
-            await Assert.ThrowsExceptionAsync<ArgumentException>
-            (
-                () => BlockchainService.CheckIfBroadcastedAsync("")
-            );
-        }
-        
-        public virtual async Task CheckIfBroadcastedAsync__TxHashIsNotHexString__ExceptionThrown()
-        {
-            await Assert.ThrowsExceptionAsync<ArgumentException>
-            (
-                () => BlockchainService.CheckIfBroadcastedAsync("0xA")
-            );
-            
-            await Assert.ThrowsExceptionAsync<ArgumentException>
-            (
-                () => BlockchainService.CheckIfBroadcastedAsync("0xZe")
+                () => BlockchainService.CheckIfBroadcastedAsync(txHash)
             );
         }
         
@@ -160,53 +68,18 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
         
         #region EstimateGasPriceAsync
 
-        private Task<BigInteger> EstimateGasPriceAsync(string to = "0xEA674fdDe714fd979de3EdF0F56AA9716B898ec8", int amount = 2)
+        public virtual async Task EstimateGasPriceAsync__ValidArgumentsPassed__TransactionBuilt()
         {
-            return BlockchainService.EstimateGasPriceAsync(to, amount);
-        }
-        
-        [TestMethod]
-        public virtual async Task EstimateGasPriceAsync__ValidParametersPassed__TransactionBuilt()
-        {
-            var actualResult = await EstimateGasPriceAsync();
+            var actualResult = await BlockchainService.EstimateGasPriceAsync("0xEA674fdDe714fd979de3EdF0F56AA9716B898ec8", 2);
 
             Assert.IsTrue(actualResult > 0);
         }
         
-        [TestMethod]
-        public virtual async Task EstimateGasPriceAsync__ToAddressIsNullOrEmpty__ExceptionThrown()
+        public virtual async Task EstimateGasPriceAsync__InvalidArgumentsPassed__ExceptionThrown(string to, int amount)
         {
             await Assert.ThrowsExceptionAsync<ArgumentException>
             (
-                () => EstimateGasPriceAsync(to: null)
-            );
-            
-            await Assert.ThrowsExceptionAsync<ArgumentException>
-            (
-                () => EstimateGasPriceAsync(to: "")
-            );
-        }
-        
-        [TestMethod]
-        public virtual async Task EstimateGasPriceAsync__ToAddressIsInvalid__ExceptionThrown()
-        {
-            await Assert.ThrowsExceptionAsync<ArgumentException>
-            (
-                () => EstimateGasPriceAsync(to: "0xea674fdDe714fd979de3EdF0F56AA9716B898ec8")
-            );
-        }
-        
-        [TestMethod]
-        public virtual async Task EstimateGasPriceAsync__AmounIsLowerOrEqualToZero__ExceptionThrown()
-        {
-            await Assert.ThrowsExceptionAsync<ArgumentException>
-            (
-                () => EstimateGasPriceAsync(amount: 0)
-            );
-            
-            await Assert.ThrowsExceptionAsync<ArgumentException>
-            (
-                () => EstimateGasPriceAsync(amount: -1)
+                () => BlockchainService.EstimateGasPriceAsync(to, amount)
             );
         }
         
@@ -214,58 +87,39 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
         
         #region GetBalanceAsync
         
-        private Task<BigInteger> GetBalanceAsync(
-            BigInteger blockNumber,
-            string address = "0x21012e8dCd6B6B175875afc1Ee1748F70835296b")
-        {
-            return BlockchainService.GetBalanceAsync(address, blockNumber);
-        }
-        
-        public virtual async Task GetBalanceAsync__ValidParametersPassed_And_BlockExists__ValidBalanceReturned()
+        public virtual async Task GetBalanceAsync__ValidArgumentsPassed_And_BlockExists__ValidBalanceReturned()
         {
             var expectedResult = BigInteger.Parse("20950042116000000000");
-            var actualResult = await GetBalanceAsync
+            var actualResult = await BlockchainService.GetBalanceAsync
             (
+                address: "0x21012e8dCd6B6B175875afc1Ee1748F70835296b",
                 blockNumber: await BlockchainService.GetLatestBlockNumberAsync()
             );
             
             Assert.AreEqual(expectedResult, actualResult);
         }
         
-        public virtual async Task GetBalanceAsync__ValidParametersPassed_And_BlockDoesNotExist__ExceptionThrown()
+        public virtual async Task GetBalanceAsync__ValidArgumentsPassed_And_BlockDoesNotExist__ExceptionThrown()
         {
             await Assert.ThrowsExceptionAsync<ArgumentOutOfRangeException>
             (
-                () => GetBalanceAsync(blockNumber: 90000000)
+                () => BlockchainService.GetBalanceAsync
+                (
+                    address: "0x21012e8dCd6B6B175875afc1Ee1748F70835296b",
+                    blockNumber: 9000000
+                )
             );
         }
-        
-        public virtual async Task GetBalanceAsync__AddressIsNullOrEmpty__ExceptionThrown()
+
+        public virtual async Task GetBalanceAsync__InvalidArguemtnsPassed__ExceptionThrown(string address, int blockNumber)
         {
             await Assert.ThrowsExceptionAsync<ArgumentException>
             (
-                () => GetBalanceAsync(blockNumber: 1, address: null)
-            );
-            
-            await Assert.ThrowsExceptionAsync<ArgumentException>
-            (
-                () => GetBalanceAsync(blockNumber: 1, address: "")
-            );
-        }
-        
-        public virtual async Task GetBalanceAsync__AddressIsInvalid__ExceptionThrown()
-        {
-            await Assert.ThrowsExceptionAsync<ArgumentException>
-            (
-                () => GetBalanceAsync(blockNumber: 1, address: "0xea674fdDe714fd979de3EdF0F56AA9716B898ec8")
-            );
-        }
-        
-        public virtual async Task GetBalanceAsync__BlockNumberIsLowerThanZero__ExceptionThrown()
-        {
-            await Assert.ThrowsExceptionAsync<ArgumentException>
-            (
-                () => GetBalanceAsync(blockNumber: -1)
+                () => BlockchainService.GetBalanceAsync
+                (
+                    address,
+                    blockNumber
+                )
             );
         }
         
@@ -273,14 +127,14 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
         
         #region GetBlockHashAsync
 
-        public virtual async Task GetBlockHashAsync__ValidParametersPassed_And_BlockExists__ValidBlockHashReturned()
+        public virtual async Task GetBlockHashAsync__ValidArgumentsPassed_And_BlockExists__ValidBlockHashReturned()
         {
             var actualResult = await BlockchainService.GetBlockHashAsync(1);
             
             Assert.AreEqual("0x41800b5c3f1717687d85fc9018faac0a6e90b39deaa0b99e7fe4fe796ddeb26a", actualResult);
         }
         
-        public virtual async Task GetBlockHashAsync__ValidParametersPassed_And_BlockDoesNotExist__ExceptionThrown()
+        public virtual async Task GetBlockHashAsync__ValidArgumentsPassed_And_BlockDoesNotExist__ExceptionThrown()
         {
             await Assert.ThrowsExceptionAsync<ArgumentOutOfRangeException>
             (
@@ -288,11 +142,11 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             );
         }
         
-        public virtual async Task GetBlockHashAsync__BlockNumberIsLowerThanZero__ExceptionThrown()
+        public virtual async Task GetBlockHashAsync__InvalidArgumentsPassed__ExceptionThrown(int blockNumber)
         {
             await Assert.ThrowsExceptionAsync<ArgumentException>
             (
-                () => BlockchainService.GetBlockHashAsync(-1)
+                () => BlockchainService.GetBlockHashAsync(blockNumber)
             );
         }
         
@@ -460,25 +314,11 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             );
         }
         
-        public virtual async Task GetCodeAsync__AddressIsNullOrEmpty__ExceptionThrown()
+        public virtual async Task GetCodeAsync__InvalidArgumentsPassed__ExceptionThrown(string address)
         {
             await Assert.ThrowsExceptionAsync<ArgumentException>
             (
-                // ReSharper disable once AssignNullToNotNullAttribute
-                () => BlockchainService.GetCodeAsync(null)
-            );
-            
-            await Assert.ThrowsExceptionAsync<ArgumentException>
-            (
-                () => BlockchainService.GetCodeAsync("")
-            );
-        }
-        
-        public virtual async Task GetCodeAsync__AddressIsInvalid__ExceptionThrown()
-        {
-            await Assert.ThrowsExceptionAsync<ArgumentException>
-            (
-                () => BlockchainService.GetCodeAsync("0xea674fdDe714fd979de3EdF0F56AA9716B898ec8")
+                () => BlockchainService.GetCodeAsync(address)
             );
         }
 
@@ -497,14 +337,14 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
 
         #region GetTimestampAsync
 
-        public virtual async Task GetTimestampAsync__BlockExists__ValidTimestampReturned()
+        public virtual async Task GetTimestampAsync__ValidArgumentsPassed_And_BlockExists__ValidTimestampReturned()
         {
             var actualResult = await BlockchainService.GetTimestampAsync(3287121);
             
             Assert.AreEqual(1526980142, actualResult);
         }
         
-        public virtual async Task GetTimestampAsync__BlockDoesNotExist__ValidTimestampReturned()
+        public virtual async Task GetTimestampAsync__ValidArgumentsPassed_And_BlockDoesNotExist__ExceptionThrown()
         {
             await Assert.ThrowsExceptionAsync<ArgumentOutOfRangeException>
             (
@@ -512,11 +352,11 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             );
         }
         
-        public virtual async Task GetTimestampAsync__BlockNumberIsLowerThanZero__ExceptionThrown()
+        public virtual async Task GetTimestampAsync__InvalidArgumentsPassed__ExceptionThrown(int blockNumber)
         {
             await Assert.ThrowsExceptionAsync<ArgumentException>
             (
-                () => BlockchainService.GetTimestampAsync(-1)
+                () => BlockchainService.GetTimestampAsync(blockNumber)
             );
         }
 
@@ -535,30 +375,11 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             Assert.AreEqual("0x54ff9c2645cbf4176b94871c07a9fed2f93ca179d99aaa5718a52815d1a40326", actualResult);
         }
         
-        public virtual void GetTransactionHash__TransactionDataIsNullOrEmpty__ExceptionThrown()
+        public virtual void GetTransactionHash__InvalidArgumentsPassed__ExceptionThrown(string txData)
         {
             Assert.ThrowsException<ArgumentException>
             (
-                // ReSharper disable once AssignNullToNotNullAttribute
-                () => BlockchainService.GetTransactionHash(null)
-            );
-            
-            Assert.ThrowsException<ArgumentException>
-            (
-                () => BlockchainService.GetTransactionHash("")
-            );
-        }
-        
-        public virtual void GetTransactionHash__TransactionDataIsNotHexString__ExceptionThrown()
-        {
-            Assert.ThrowsException<ArgumentException>
-            (
-                () => BlockchainService.GetTransactionHash("0xA")
-            );
-            
-            Assert.ThrowsException<ArgumentException>
-            (
-                () => BlockchainService.GetTransactionHash("0xZe")
+                () => BlockchainService.GetTransactionHash(txData)
             );
         }
         
@@ -602,11 +423,11 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             Assert.AreEqual(0, actualResult.Count());
         }
         
-        public virtual async Task GetTransactionsAsync__BlockNumberIsLowerThanZero__ExceptionThrown()
+        public virtual async Task GetTransactionsAsync__InvalidArgumentsPassed__ExceptionThrown(int blockNumber)
         {
             await Assert.ThrowsExceptionAsync<ArgumentException>
             (
-                () => BlockchainService.GetTransactionsAsync(-1)
+                () => BlockchainService.GetTransactionsAsync(blockNumber)
             );
         }
         
@@ -614,7 +435,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
         
         #region GetTransactionSigner
         
-        public virtual void GetTransactionSigner__ValidTransactionDataPassed__ValidTransactionSignerReturned()
+        public virtual void GetTransactionSigner__ValidArgumentsPassed__ValidTransactionSignerReturned()
         {
             const string expectedResult = "0x1b3Ac7ed3b0BeEFcC5cDF857A3a25D4330d05AAc";
 
@@ -635,34 +456,15 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             }
         }
         
-        public virtual void GetTransactionSigner__TransactionDataIsNullOrEmpty__ExceptionThrown()
+        public virtual void GetTransactionSigner__InvalidArgumentsPassed__ExceptionThrown(string signedTxData)
         {
             Assert.ThrowsException<ArgumentException>
             (
-                // ReSharper disable once AssignNullToNotNullAttribute
-                () => BlockchainService.GetTransactionSigner(null)
-            );
-            
-            Assert.ThrowsException<ArgumentException>
-            (
-                () => BlockchainService.GetTransactionSigner("")
+                () => BlockchainService.GetTransactionSigner(signedTxData)
             );
         }
         
-        public virtual void GetTransactionSigner__TransactionDataIsNotHexString__ExceptionThrown()
-        {
-            Assert.ThrowsException<ArgumentException>
-            (
-                () => BlockchainService.GetTransactionSigner("0xA")
-            );
-            
-            Assert.ThrowsException<ArgumentException>
-            (
-                () => BlockchainService.GetTransactionSigner("0xZe")
-            );
-        }
-
-        public virtual void GetTransactionSigner__TransactionHasNotBeenSigned__EWxceptionThrown()
+        public virtual void GetTransactionSigner__TransactionHasNotBeenSigned__ExceptionThrown()
         {
             Exception exception = null;
             
@@ -683,31 +485,12 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
         #endregion
         
         #region SendRawTransactionAsync
-        
-        public virtual async Task SendRawTransactionAsync__TxHashIsNullOrEmpty__ExceptionThrown()
+
+        public virtual async Task SendRawTransactionAsync__InvalidArgumentsPassed__ExceptionThrown(string signedTxData)
         {
             await Assert.ThrowsExceptionAsync<ArgumentException>
             (
-                // ReSharper disable once AssignNullToNotNullAttribute
-                () => BlockchainService.SendRawTransactionAsync(null)
-            );
-            
-            await Assert.ThrowsExceptionAsync<ArgumentException>
-            (
-                () => BlockchainService.SendRawTransactionAsync("")
-            );
-        }
-        
-        public virtual async Task SendRawTransactionAsync__TxHashIsNotHexString__ExceptionThrown()
-        {
-            await Assert.ThrowsExceptionAsync<ArgumentException>
-            (
-                () => BlockchainService.SendRawTransactionAsync("0xA")
-            );
-            
-            await Assert.ThrowsExceptionAsync<ArgumentException>
-            (
-                () => BlockchainService.SendRawTransactionAsync("0xZe")
+                () => BlockchainService.SendRawTransactionAsync(signedTxData)
             );
         }
         
@@ -715,7 +498,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
         
         #region TryGetTransactionErrorAsync
 
-        public virtual async Task TryGetTransactionErrorAsync__FailedTxHashPassed__ValidErrorListReturned()
+        public virtual async Task TryGetTransactionErrorAsync__TransactionIsFailed__ValidErrorListReturned()
         {
             var actualResult = (await BlockchainService.TryGetTransactionErrorsAsync
             (
@@ -727,7 +510,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             Assert.AreEqual("Reverted", actualResult[0]);
         }
         
-        public virtual async Task TryGetTransactionErrorAsync__SuccessfulTxHashPassed__EmptyErrorListReturned()
+        public virtual async Task TryGetTransactionErrorAsync__TransactionIsSuccessful__EmptyErrorListReturned()
         {
             var actualResult = (await BlockchainService.TryGetTransactionErrorsAsync
             (
@@ -738,7 +521,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             Assert.AreEqual(0, actualResult.Count);
         }
         
-        public virtual async Task TryGetTransactionErrorAsync__NonExistingTxHashPassed__NullReturned()
+        public virtual async Task TryGetTransactionErrorAsync__TransactionDoesNotExist__NullReturned()
         {
             var actualResult = await BlockchainService.TryGetTransactionErrorsAsync
             (
@@ -748,33 +531,13 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             Assert.IsNull(actualResult);
         }
         
-        public virtual async Task TryGetTransactionErrorAsync__TransactionHashIsNullOrEmpty__ExceptionThrown()
+        public virtual async Task TryGetTransactionErrorAsync__InvalidArgumentsPassed__ExceptionThrown(string txHash)
         {
             await Assert.ThrowsExceptionAsync<ArgumentException>
             (
-                // ReSharper disable once AssignNullToNotNullAttribute
-                () => BlockchainService.TryGetTransactionErrorsAsync(null)
-            );
-            
-            await Assert.ThrowsExceptionAsync<ArgumentException>
-            (
-                () => BlockchainService.TryGetTransactionErrorsAsync("")
+                () => BlockchainService.TryGetTransactionErrorsAsync(txHash)
             );
         }
-        
-        public virtual async Task TryGetTransactionErrorAsync__TransactionHashIsNotHexString__ExceptionThrown()
-        {
-            await Assert.ThrowsExceptionAsync<ArgumentException>
-            (
-                () => BlockchainService.TryGetTransactionErrorsAsync("0xA")
-            );
-            
-            await Assert.ThrowsExceptionAsync<ArgumentException>
-            (
-                () => BlockchainService.TryGetTransactionErrorsAsync("0xZe")
-            );
-        }
-        
         #endregion
         
         #region TryGetTransactionReceiptAsync
@@ -807,30 +570,11 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             Assert.IsNull(actualResult);
         }
         
-        public virtual async Task TryGetTransactionReceiptAsync__TransactionHashIsNullOrEmpty__ExceptionThrown()
+        public virtual async Task TryGetTransactionReceiptAsync__InvalidArgumentsPassed__ExceptionThrown(string txHash)
         {
             await Assert.ThrowsExceptionAsync<ArgumentException>
             (
-                // ReSharper disable once AssignNullToNotNullAttribute
-                () => BlockchainService.TryGetTransactionReceiptAsync(null)
-            );
-            
-            await Assert.ThrowsExceptionAsync<ArgumentException>
-            (
-                () => BlockchainService.TryGetTransactionReceiptAsync("")
-            );
-        }
-        
-        public virtual async Task TryGetTransactionReceiptAsync__TransactionHashIsNotHexString__ExceptionThrown()
-        {
-            await Assert.ThrowsExceptionAsync<ArgumentException>
-            (
-                () => BlockchainService.TryGetTransactionReceiptAsync("0xA")
-            );
-            
-            await Assert.ThrowsExceptionAsync<ArgumentException>
-            (
-                () => BlockchainService.TryGetTransactionReceiptAsync("0xZe")
+                () => BlockchainService.TryGetTransactionReceiptAsync(txHash)
             );
         }
         
@@ -838,7 +582,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
         
         #region UnsignTransactionAsync
 
-        public virtual async Task UnsignTransactionAsync__ValidSignedTxDataPassed__ValidUnsignedTxDataReturned()
+        public virtual async Task UnsignTransactionAsync__ValidArgumentsPassed__ValidUnsignedTxDataReturned()
         {
             var actualResult = await BlockchainService.UnsignTransactionAsync
             (
@@ -849,30 +593,11 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             Assert.AreEqual("0xdd80020294ea674fdde714fd979de3edf0f56aa9716b898ec80280808080", actualResult);
         }
 
-        public virtual async Task UnsignTransactionAsync__TxHashIsNullOrEmpty__ExceptionThrown()
+        public virtual async Task UnsignTransactionAsync__InvalidArgumentsPassed__ExceptionThrown(string signedTxData)
         {
             await Assert.ThrowsExceptionAsync<ArgumentException>
             (
-                // ReSharper disable once AssignNullToNotNullAttribute
-                () => BlockchainService.UnsignTransactionAsync(null)
-            );
-            
-            await Assert.ThrowsExceptionAsync<ArgumentException>
-            (
-                () => BlockchainService.UnsignTransactionAsync("")
-            );
-        }
-        
-        public virtual async Task UnsignTransactionAsync__TxHashIsNotHexString__ExceptionThrown()
-        {
-            await Assert.ThrowsExceptionAsync<ArgumentException>
-            (
-                () => BlockchainService.UnsignTransactionAsync("0xA")
-            );
-            
-            await Assert.ThrowsExceptionAsync<ArgumentException>
-            (
-                () => BlockchainService.UnsignTransactionAsync("0xZe")
+                () => BlockchainService.UnsignTransactionAsync(signedTxData)
             );
         }
         

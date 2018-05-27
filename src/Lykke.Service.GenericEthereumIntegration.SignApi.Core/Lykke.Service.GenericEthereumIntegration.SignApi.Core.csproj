@@ -7,7 +7,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" Version="11.1.0" />
-    <PackageReference Include="Lykke.Common" Version="6.7.0" />
+    <PackageReference Include="Lykke.Common" Version="6.8.2" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lykke.Service.GenericEthereumIntegration.Common.Core\Lykke.Service.GenericEthereumIntegration.Common.Core.csproj" />

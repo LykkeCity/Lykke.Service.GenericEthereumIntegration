@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Lykke.Service.GenericEthereumIntegration.Api.Core.Services.Interfaces;
+using Lykke.Service.GenericEthereumIntegration.Common.Core.Exceptions;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Repositories.DTOs;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Repositories.Interfaces;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Settings.Integration;
@@ -15,6 +16,8 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
     [UsedImplicitly]
     public class HistoricalTransactionService : IHistoricalTransactionService
     {
+        private const string ShouldBeGreaterThanOne = "Should be greater than one.";
+        
         private readonly IHistoricalTransactionRepository _historicalTransactionRepository;
         private readonly AssetSettings _assetSettings;
 
@@ -32,7 +35,20 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
         {
             #region Validation
             
-            await ValidateInputParametersAsync(address, take);
+            if (address.IsNullOrEmpty())
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldNotBeNullOrEmpty, nameof(address));
+            }
+
+            if (!await AddressChecksum.ValidateAsync(address))
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeValidAddress, nameof(address));
+            }
+
+            if (take <= 1)
+            {
+                throw new ArgumentException(ShouldBeGreaterThanOne, nameof(take));
+            }
             
             #endregion
             
@@ -45,31 +61,26 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
         {
             #region Validation
             
-            await ValidateInputParametersAsync(address, take);
+            if (address.IsNullOrEmpty())
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldNotBeNullOrEmpty, nameof(address));
+            }
+
+            if (!await AddressChecksum.ValidateAsync(address))
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeValidAddress, nameof(address));
+            }
+
+            if (take <= 1)
+            {
+                throw new ArgumentException(ShouldBeGreaterThanOne, nameof(take));
+            }
             
             #endregion
             
             var transactions = await _historicalTransactionRepository.GetOutgoingHistory(address, take, afterHash);
 
             return (transactions, _assetSettings.Id);
-        }
-
-        private async Task ValidateInputParametersAsync(string address, int take)
-        {
-            if (string.IsNullOrEmpty(address))
-            {
-                throw new ArgumentException("Should not be null or empty.", nameof(address));
-            }
-
-            if (await AddressChecksum.ValidateAsync(address))
-            {
-                throw new ArgumentException("Should be a valid address.", nameof(address));
-            }
-
-            if (take <= 1)
-            {
-                throw new ArgumentException("Should be greater than one.", nameof(take));
-            }
         }
     }
 }

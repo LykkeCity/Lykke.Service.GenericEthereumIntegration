@@ -159,7 +159,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Services
         {
             var request = new RpcRequest($"{Guid.NewGuid()}", "trace_transaction", txHash);
 
-            return (await _web3Parity.Client.SendRequestAsync<IEnumerable<TransactionTrace>>(request))
+            return (await _web3Parity.Client.SendRequestAsync<IEnumerable<TransactionTrace>>(request))?
                 .ToArray();
         }
     }
