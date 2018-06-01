@@ -22,27 +22,29 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Tests.Services
         [DataRow("70000000000", "70000000000")]
         [DataRow("90000000000", MaxGasPrice)]
 
-        public async Task CalculateGasPriceAsync__ExpectedResultReturned(
+        public async Task CalculateGasPriceAsync__ValidResultReturned(
             string estimatedGasPrice,
             string expectedResult)
         {
             var blockchainService = new Mock<IBlockchainService>();
-            var gasPriceRepository = new Mock<IGasPriceRepository>();
-            var settings = new ApiSettings
-            {
-                DefaultMaxGasPrice = MaxGasPrice,
-                DefaultMinGasPrice = MinGasPrice
-            };
             
             blockchainService
                 .Setup(x => x.EstimateGasPriceAsync(It.IsAny<string>(), It.IsAny<BigInteger>()))
                 .ReturnsAsync(BigInteger.Parse(estimatedGasPrice));
 
+            
+            var gasPriceRepository = new Mock<IGasPriceRepository>();
+            
             gasPriceRepository
                 .Setup(x => x.GetOrAddAsync(It.IsAny<BigInteger>(), It.IsAny<BigInteger>()))
                 .ReturnsAsync((BigInteger.Parse(MinGasPrice), BigInteger.Parse(MaxGasPrice)));
 
 
+            var settings = new ApiSettings
+            {
+                DefaultMaxGasPrice = MaxGasPrice,
+                DefaultMinGasPrice = MinGasPrice
+            };
 
             var gasPriceOracleService = new GasPriceOracleService
             (

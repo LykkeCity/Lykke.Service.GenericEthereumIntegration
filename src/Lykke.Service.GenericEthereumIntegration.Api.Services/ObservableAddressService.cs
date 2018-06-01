@@ -43,7 +43,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
                 return;
             }
 
-            throw new NotFoundException($"Specified address [{address}] has not been found in the incoming observation list.");
+            throw new ConflictException($"Specified address [{address}] has already been added to the incoming observation list.");
         }
 
         public async Task AddToOutgoingObservationListAsync(string address)
@@ -67,7 +67,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
                 return;
             }
 
-            throw new NotFoundException($"Specified address [{address}] has not been found in the outgoing observation list.");
+            throw new ConflictException($"Specified address [{address}] has already been added to the outgoing observation list.");
         }
 
         public async Task DeleteFromIncomingObservationListAsync(string address)
@@ -91,7 +91,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
                 return;
             }
 
-            throw new ConflictException($"Specified address [{address}] has already bbeen added to the incoming observation list.");
+            throw new NotFoundException($"Specified address [{address}] has not been found in the incoming observation list.");
         }
 
         public async Task DeleteFromOutgoingObservationListAsync(string address)
@@ -115,7 +115,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
                 return;
             }
 
-            throw new ConflictException($"Specified address [{address}] has already bbeen added to the outgoing observation list.");
+            throw new NotFoundException($"Specified address [{address}] has not been found in the outgoing observation list.");
         }
     }
 }

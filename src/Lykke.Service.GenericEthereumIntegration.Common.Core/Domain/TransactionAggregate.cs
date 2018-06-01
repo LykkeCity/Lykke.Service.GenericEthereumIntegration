@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Numerics;
+using Lykke.Service.GenericEthereumIntegration.Common.Core.Domain.Interfaces;
 
 namespace Lykke.Service.GenericEthereumIntegration.Common.Core.Domain
 {
-    public sealed class TransactionAggregate
+    public sealed class TransactionAggregate : ITransactionAggregate
     {
         private TransactionAggregate(
             BigInteger amount,

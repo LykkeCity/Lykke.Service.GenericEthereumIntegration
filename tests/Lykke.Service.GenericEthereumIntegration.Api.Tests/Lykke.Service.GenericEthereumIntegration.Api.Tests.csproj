@@ -16,5 +16,6 @@
     <ProjectReference Include="..\..\src\Lykke.Service.GenericEthereumIntegration.Api.Repositories\Lykke.Service.GenericEthereumIntegration.Api.Repositories.csproj" />
     <ProjectReference Include="..\..\src\Lykke.Service.GenericEthereumIntegration.Api.Services\Lykke.Service.GenericEthereumIntegration.Api.Services.csproj" />
     <ProjectReference Include="..\..\src\Lykke.Service.GenericEthereumIntegration.Api\Lykke.Service.GenericEthereumIntegration.Api.csproj" />
+    <ProjectReference Include="..\Lykke.Service.GenericEthereumIntegration.TDK\Lykke.Service.GenericEthereumIntegration.TDK.csproj" />
   </ItemGroup>
 </Project>

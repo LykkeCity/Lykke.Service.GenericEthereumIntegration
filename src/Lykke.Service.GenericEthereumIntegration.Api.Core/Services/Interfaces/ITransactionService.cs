@@ -2,7 +2,8 @@
 using System.Numerics;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
-using Lykke.Service.GenericEthereumIntegration.Common.Core.Domain;
+using Lykke.Service.GenericEthereumIntegration.Common.Core.Domain.Interfaces;
+
 
 namespace Lykke.Service.GenericEthereumIntegration.Api.Core.Services.Interfaces
 {
@@ -14,10 +15,10 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Core.Services.Interfaces
         [ItemNotNull]
         Task<string> BuildTransactionAsync(BigInteger amount, [NotNull] string fromAddress, bool includeFee, Guid operationId, [NotNull] string toAddress);
 
-        Task DeleteTransactionStateAsync(Guid operationId);
+        Task DeleteTransactionAsync(Guid operationId);
 
         [ItemNotNull]
-        Task<TransactionAggregate> GetTransactionAsync(Guid operationId);
+        Task<ITransactionAggregate> GetTransactionAsync(Guid operationId);
 
         [ItemNotNull]
         Task<string> RebuildTransactionAsync(decimal feeFactor, Guid operationId);

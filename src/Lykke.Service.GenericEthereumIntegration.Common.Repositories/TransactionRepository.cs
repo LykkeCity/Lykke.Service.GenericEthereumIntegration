@@ -6,6 +6,7 @@ using AzureStorage;
 using AzureStorage.Tables.Templates.Index;
 using Common;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Domain;
+using Lykke.Service.GenericEthereumIntegration.Common.Core.Domain.Interfaces;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Repositories.Interfaces;
 using Lykke.Service.GenericEthereumIntegration.Common.Repositories.Entities;
 
@@ -27,7 +28,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Repositories
         }
 
 
-        public async Task AddAsync(TransactionAggregate aggregate)
+        public async Task AddAsync(ITransactionAggregate aggregate)
         {
             var entity = new TransactionEntity
             {
@@ -72,19 +73,19 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Repositories
             }
         }
         
-        public async Task<IEnumerable<TransactionAggregate>> GetAllForOperationAsync(Guid operationId)
+        public async Task<IEnumerable<ITransactionAggregate>> GetAllForOperationAsync(Guid operationId)
         {
             return (await _table.GetDataAsync(GetPartitionKey(operationId)))
                 .Select(ConvertEntityToAggregate);
         }
 
-        public async Task<IEnumerable<TransactionAggregate>> GetAllInProgressAsync()
+        public async Task<IEnumerable<ITransactionAggregate>> GetAllInProgressAsync()
         {
             return (await _table.GetDataAsync(x => x.State == TransactionState.InProgress))
                 .Select(ConvertEntityToAggregate);
         }
 
-        public async Task<TransactionAggregate> TryGetAsync(string transactionHash)
+        public async Task<ITransactionAggregate> TryGetAsync(string transactionHash)
         {
             var index = await _signedTxHashIndexTable.GetDataAsync
             (
@@ -108,7 +109,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Repositories
             }
         }
 
-        public async Task UpdateAsync(TransactionAggregate aggregate)
+        public async Task UpdateAsync(ITransactionAggregate aggregate)
         {
             TransactionEntity UpdateAction(TransactionEntity entity)
             {

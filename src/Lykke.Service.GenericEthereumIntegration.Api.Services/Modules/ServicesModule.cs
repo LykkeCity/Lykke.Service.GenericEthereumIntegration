@@ -1,5 +1,7 @@
 ﻿using Autofac;
 using Lykke.Service.GenericEthereumIntegration.Api.Core.Services.Interfaces;
+using Lykke.Service.GenericEthereumIntegration.Api.Services.Strategies;
+using Lykke.Service.GenericEthereumIntegration.Api.Services.Strategies.Interfaces;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Services.Interfaces;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Settings.Integration;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Settings.Service;
@@ -20,6 +22,17 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services.Modules
 
         protected override void Load(ContainerBuilder builder)
         {
+            #region Strategies
+
+            builder
+                .Register(CreateWaitUntilTransactionIsInPoolStrategy)
+                .As<IWaitUntilTransactionIsInPoolStrategy>()
+                .SingleInstance();
+            
+            #endregion
+            
+            #region Services
+            
             builder
                 .Register(x => _blockchainServiceFactory.Build())
                 .AsSelf()
@@ -39,7 +52,6 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services.Modules
                 .RegisterType<GasPriceOracleService>()
                 .As<IGasPriceOracleService>()
                 .SingleInstance();
-
 
             builder
                 .RegisterType<HealthService>()
@@ -65,6 +77,11 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services.Modules
                 .RegisterType<TransactionService>()
                 .As<ITransactionService>()
                 .SingleInstance();
+            
+            #endregion
         }
+        
+        private static WaitUntilTransactionIsInPoolStrategy CreateWaitUntilTransactionIsInPoolStrategy(IComponentContext context)
+            => new WaitUntilTransactionIsInPoolStrategy(context.Resolve<IBlockchainService>(), 500);
     }
 }

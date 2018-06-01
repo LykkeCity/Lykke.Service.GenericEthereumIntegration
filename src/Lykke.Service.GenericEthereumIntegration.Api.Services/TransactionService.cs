@@ -7,12 +7,14 @@ using Lykke.Common.Chaos;
 using Lykke.Service.GenericEthereumIntegration.Api.Core.Exceptions;
 using Lykke.Service.GenericEthereumIntegration.Api.Core.Services.Interfaces;
 using Lykke.Service.GenericEthereumIntegration.Api.Core.Settings.Service;
+using Lykke.Service.GenericEthereumIntegration.Api.Services.Strategies.Interfaces;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Domain;
+using Lykke.Service.GenericEthereumIntegration.Common.Core.Domain.Interfaces;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Exceptions;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Repositories.Interfaces;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Services.Interfaces;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Utils;
-using Polly;
+
 
 namespace Lykke.Service.GenericEthereumIntegration.Api.Services
 {
@@ -20,26 +22,34 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
     public class TransactionService : ITransactionService
     {
         private readonly IBlockchainService _blockchainService;
+        private readonly ICalculateTransactionParamsStrategy _calculateTransactionParamsStrategy;
         private readonly IChaosKitty _chaosKitty;
         private readonly BigInteger _gasAmount;
-        private readonly IGasPriceOracleService _gasPriceOracleService;
+        private readonly IRegisterTransactionStrategy _registerTransactionStrategy;
+        private readonly ISendRawTransactionOrGetTxHashStrategy _sendRawTransactionOrGetTxHashStrategy;
         private readonly ITransactionRepository _transactionRepository;
+        private readonly IWaitUntilTransactionIsInPoolStrategy _waitUntilTransactionIsInPoolStrategy;
         
 
-        public TransactionService(
+        internal TransactionService(
             [NotNull] IBlockchainService blockchainService,
-            [NotNull] IGasPriceOracleService gasPriceOracleService,
+            [NotNull] ICalculateTransactionParamsStrategy calculateTransactionParamsStrategy,
+            [NotNull] IRegisterTransactionStrategy registerTransactionStrategy,
+            [NotNull] ISendRawTransactionOrGetTxHashStrategy sendRawTransactionOrGetTxHashStrategy,
             [NotNull] ApiSettings settings,
             [NotNull] ITransactionRepository transactionRepository,
+            [NotNull] IWaitUntilTransactionIsInPoolStrategy waitUntilTransactionIsInPoolStrategy,
             [NotNull] IChaosKitty chaosKitty)
         {
             _blockchainService = blockchainService;
+            _calculateTransactionParamsStrategy = calculateTransactionParamsStrategy;
             _chaosKitty = chaosKitty;
             _gasAmount = BigInteger.Parse(settings.GasAmount);
-            _gasPriceOracleService = gasPriceOracleService;
+            _registerTransactionStrategy = registerTransactionStrategy;
+            _sendRawTransactionOrGetTxHashStrategy = sendRawTransactionOrGetTxHashStrategy;
             _transactionRepository = transactionRepository;
+            _waitUntilTransactionIsInPoolStrategy = waitUntilTransactionIsInPoolStrategy;
         }
-
 
         public async Task<string> BroadcastTransactionAsync(Guid operationId, string signedTxData)
         {
@@ -59,7 +69,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
             
             var operationTransactions = (await _transactionRepository.GetAllForOperationAsync(operationId)).ToList();
 
-            if (operationTransactions.Any(x => x.SignedTxData == signedTxData && x.State != TransactionState.InProgress))
+            if (operationTransactions.Any(x => x.SignedTxData == signedTxData))
             {
                 throw new ConflictException
                 (
@@ -80,7 +90,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
 
             var txSigner = _blockchainService.GetTransactionSigner(signedTxData);
 
-            if (!builtTransaction.FromAddress.Equals(txSigner))
+            if (builtTransaction.FromAddress != txSigner)
             {
                 throw new BadRequestException
                 (
@@ -88,17 +98,17 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
                 );
             }
 
-            var txHash = await SendRawTransactionOrGetTxHashAsync(signedTxData);
+            var signedTxHash = await _sendRawTransactionOrGetTxHashStrategy.ExecuteAsync(signedTxData);
 
-            _chaosKitty.Meow(txHash);
+            _chaosKitty.Meow(signedTxHash);
 
-            await WaitUntilTransactionIsInPoolAsync(txHash, 500);
-
-            builtTransaction.OnBroadcasted(signedTxData, txHash);
+            await _waitUntilTransactionIsInPoolStrategy.ExecuteAsync(signedTxHash);
+            
+            builtTransaction.OnBroadcasted(signedTxData, signedTxHash);
 
             await _transactionRepository.UpdateAsync(builtTransaction);
             
-            return txHash;
+            return signedTxHash;
         }
 
         public async Task<string> BuildTransactionAsync(BigInteger amount, string fromAddress, bool includeFee, Guid operationId, string toAddress)
@@ -110,9 +120,19 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
                 throw new ArgumentException(CommonExceptionMessages.ShouldBeGreaterThanZero, nameof(amount));
             }
             
-            if (string.IsNullOrEmpty(fromAddress))
+            if (fromAddress.IsNullOrEmpty())
             {
                 throw new ArgumentException(CommonExceptionMessages.ShouldNotBeNullOrEmpty, nameof(fromAddress));
+            }
+
+            if (toAddress.IsNullOrEmpty())
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldNotBeNullOrEmpty, nameof(toAddress));
+            }
+
+            if (fromAddress == toAddress)
+            {
+                throw new ArgumentException($"{nameof(toAddress)} should differ from {nameof(fromAddress)}.", nameof(toAddress));
             }
             
             if (!await AddressChecksum.ValidateAsync(fromAddress))
@@ -120,22 +140,12 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
                 throw new ArgumentException(CommonExceptionMessages.ShouldBeValidAddress, nameof(fromAddress));
             }
 
-            if (string.IsNullOrEmpty(toAddress))
-            {
-                throw new ArgumentException(CommonExceptionMessages.ShouldNotBeNullOrEmpty, nameof(toAddress));
-            }
-            
             if (!await AddressChecksum.ValidateAsync(toAddress))
             {
                 throw new ArgumentException(CommonExceptionMessages.ShouldBeValidAddress, nameof(toAddress));
             }
 
             #endregion
-
-            BigInteger fee;
-            BigInteger gasPrice;
-
-            (amount, fee, gasPrice) = await CalculateTransactionParamsAsync(amount, includeFee, toAddress);
 
             var operationTransactions = (await _transactionRepository.GetAllForOperationAsync(operationId));
             var initialTransaction = operationTransactions.OrderBy(x => x.BuiltOn).FirstOrDefault();
@@ -145,6 +155,11 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
                 return initialTransaction.TxData;
             }
 
+            BigInteger fee;
+            BigInteger gasPrice;
+
+            (amount, fee, gasPrice) = await _calculateTransactionParamsStrategy.ExecuteAsync(amount, includeFee, toAddress);
+            
             var nonce = await _blockchainService.GetNextNonceAsync(fromAddress);
 
             var txData = _blockchainService.BuildTransaction
@@ -156,7 +171,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
                 gasAmount: _gasAmount
             );
 
-            var operationTransaction = TransactionAggregate.Build
+            await _registerTransactionStrategy.ExecuteAsync
             (
                 amount: amount,
                 fee: fee,
@@ -168,15 +183,13 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
                 toAddress: toAddress,
                 txData: txData
             );
-
-            await _transactionRepository.AddAsync(operationTransaction);
             
             _chaosKitty.Meow(operationId);
 
             return txData;
         }
 
-        public async Task DeleteTransactionStateAsync(Guid operationId)
+        public async Task DeleteTransactionAsync(Guid operationId)
         {
             if (await _transactionRepository.DeleteIfExistsAsync(operationId))
             {
@@ -186,96 +199,52 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
             throw new NotFoundException($"No transactions for specified operation [{operationId}] has been found.");
         }
 
-        public async Task<TransactionAggregate> GetTransactionAsync(Guid operationId)
+        public async Task<ITransactionAggregate> GetTransactionAsync(Guid operationId)
         {
             var transactions = (await _transactionRepository.GetAllForOperationAsync(operationId))
                 .ToList();
-            
-            var completedTransaction = transactions
-                .SingleOrDefault(x => x.State == TransactionState.Completed || x.State == TransactionState.Failed);
 
+            var completedTransactions = transactions
+                .Where(x => x.State == TransactionState.Completed || x.State == TransactionState.Failed)
+                .ToList();
+
+            if (completedTransactions.Count > 1)
+            {
+                throw new UnsupportedEdgeCaseException($"Operation [{operationId}] contains more than one completed transaction.");
+            }
+            
+            var completedTransaction = completedTransactions
+                .SingleOrDefault();
+                
             if (completedTransaction != null)
             {
                 return completedTransaction;
             }
-            else
-            {
-                var latestInProgressTransaction = transactions
-                    .Where(x => x.State == TransactionState.InProgress)
-                    .OrderByDescending(x => x.BroadcastedOn)
-                    .FirstOrDefault();
+            
+            var latestInProgressTransaction = transactions
+                .Where(x => x.State == TransactionState.InProgress)
+                .OrderByDescending(x => x.BroadcastedOn)
+                .FirstOrDefault();
 
-                if (latestInProgressTransaction != null)
-                {
-                    return latestInProgressTransaction;
-                }
+            if (latestInProgressTransaction != null)
+            {
+                return latestInProgressTransaction;
             }
 
+            
+            var earliestBuiltTransaction = transactions
+                .Where(x => x.State == TransactionState.Built)
+                .OrderBy(x => x.BuiltOn)
+                .FirstOrDefault();
+
+            if (earliestBuiltTransaction != null)
+            {
+                return earliestBuiltTransaction;
+            }
+            
             throw new NotFoundException($"No transactions for specified operation [{operationId}] has been found.");
         }
 
-        internal static BigInteger CalculateFeeWithFeeFactor(BigInteger gasPrice, BigInteger gasAmount, decimal feeFactor)
-        {
-            var feeFactorBits = decimal.GetBits(feeFactor);
-            var feeFactorMultiplier = new BigInteger(new decimal(feeFactorBits[0], feeFactorBits[1], feeFactorBits[2], false, 0));
-            var decimalPlacesNumber = (int)BitConverter.GetBytes(feeFactorBits[3])[2];
-            var feeFactorDivider = new BigInteger(Math.Pow(10, decimalPlacesNumber));
-            var newGasPrice = gasPrice * feeFactorMultiplier / feeFactorDivider;
-            
-            if (newGasPrice > gasPrice)
-            {
-                return newGasPrice * gasAmount;
-            }
-
-            return (gasPrice + 1) * gasAmount;
-        }
-
-        internal (BigInteger Amount, BigInteger Fee, BigInteger GasPrice) CalculateTransactionParams(TransactionAggregate transaction, decimal feeFactor)
-        {
-            var amount = transaction.Amount;
-            var fee = transaction.Fee;
-            var gasPrice = transaction.GasPrice;
-            var includeFee = transaction.IncludeFee;
-
-
-            if (includeFee)
-            {
-                amount += fee;
-            }
-
-            fee = CalculateFeeWithFeeFactor(gasPrice, _gasAmount, feeFactor);
-            
-            if (includeFee)
-            {
-                amount -= fee;
-            }
-
-            return (amount, fee, gasPrice);
-        }
-
-        internal async Task<(BigInteger Amount, BigInteger Fee, BigInteger GasPrice)> CalculateTransactionParamsAsync(BigInteger amount, bool includeFee, string toAddress)
-        {
-            var gasPrice = await _gasPriceOracleService.CalculateGasPriceAsync(toAddress, amount);
-            var fee = gasPrice * _gasAmount;
-
-            if (includeFee)
-            {
-                amount -= fee;
-            }
-
-            #region Result validation
-
-            if (amount <= 0)
-            {
-                throw new BadRequestException($"Amount [{amount}] is too small.");
-            }
-
-            #endregion
-
-            return (amount, fee, gasPrice);
-        }
-
-        /// <inheritdoc />
         public async Task<string> RebuildTransactionAsync(decimal feeFactor, Guid operationId)
         {
             #region Validation
@@ -295,7 +264,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
                 throw new NotFoundException($"Initial transaction for specified operation [{operationId}] has not been not found.");
             }
 
-            var (amount, fee, gasPrice) = CalculateTransactionParams(initialTransaction, feeFactor);
+            var (amount, fee, gasPrice) = _calculateTransactionParamsStrategy.Execute(initialTransaction, feeFactor);
 
             var txData = _blockchainService.BuildTransaction
             (
@@ -309,8 +278,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
             // If same transaction has not been built earlier, persisting it
             if (operationTransactions.All(x => x.TxData != txData))
             {
-                var operationTransaction = TransactionAggregate.Build
-                (
+                await _registerTransactionStrategy.ExecuteAsync(
                     amount: amount,
                     fee: fee,
                     fromAddress: initialTransaction.FromAddress,
@@ -321,72 +289,11 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
                     toAddress: initialTransaction.ToAddress,
                     txData: txData
                 );
-
-                await _transactionRepository.AddAsync(operationTransaction);
             }
 
             _chaosKitty.Meow(operationId);
 
             return txData;
-        }
-
-        /// <summary>
-        ///     Sends raw transaction, or, if it has already been sent, returns it's txHash
-        /// </summary>
-        /// <param name="signedTxData">
-        ///     Signed transaction data.
-        /// </param>
-        /// <returns>
-        ///     Transaction hash.
-        /// </returns>
-        public async Task<string> SendRawTransactionOrGetTxHashAsync(string signedTxData)
-        {
-            var txHash = _blockchainService.GetTransactionHash(signedTxData);
-            var receipt = await _blockchainService.TryGetTransactionReceiptAsync(txHash);
-
-            if (receipt == null)
-            {
-                await _blockchainService.SendRawTransactionAsync(signedTxData);
-            }
-
-            return txHash;
-        }
-
-        /// <summary>
-        ///    Waits for transaction to be appered in tx pool (or be mined). 
-        /// </summary>
-        /// <param name="txHash">
-        ///    Hash of a transaction to wait.
-        /// </param>
-        /// <param name="delayFactor">
-        ///    Multiplier for delays between retries (ms).
-        /// </param>
-        /// <exception cref="UnsupportedEdgeCaseException">
-        ///    Thrown if transaction neither appeared in tx pool, nor been mined after five checks.
-        /// </exception>
-        public async Task WaitUntilTransactionIsInPoolAsync(string txHash, int delayFactor)
-        {
-            var retryPolicy = Policy
-                .HandleResult(false)
-                .WaitAndRetryAsync(4, retryAttempt => TimeSpan.FromMilliseconds(delayFactor * retryAttempt));
-
-            var txIsInPoolOrMined = await retryPolicy.ExecuteAsync(async () =>
-            {
-                try
-                {
-                    return await _blockchainService.CheckIfBroadcastedAsync(txHash)
-                        || await _blockchainService.TryGetTransactionReceiptAsync(txHash) != null;
-                }
-                catch (Exception)
-                {
-                    return false;
-                }
-            });
-
-            if (!txIsInPoolOrMined)
-            {
-                throw new UnsupportedEdgeCaseException("Transaction didn't appear in memory pool in the specified period of time.");
-            }
         }
     }
 }

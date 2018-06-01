@@ -8,6 +8,7 @@ using Lykke.Service.GenericEthereumIntegration.Api.Core.Services.Interfaces;
 using Lykke.Service.GenericEthereumIntegration.Api.Models;
 using Lykke.Service.GenericEthereumIntegration.Common.Controllers;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Domain;
+using Lykke.Service.GenericEthereumIntegration.Common.Core.Domain.Interfaces;
 using Lykke.Service.GenericEthereumIntegration.Common.Validation;
 using Microsoft.AspNetCore.Mvc;
 
@@ -72,7 +73,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Controllers
         [HttpDelete("broadcast/{operationId:guid}"), ValidateModel]
         public async Task<IActionResult> DeleteState(OperationRequest request)
         {
-            await _transactionService.DeleteTransactionStateAsync(request.OperationId);
+            await _transactionService.DeleteTransactionAsync(request.OperationId);
 
             return Ok();
         }
@@ -123,7 +124,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Controllers
             });
         }
 
-        private static BroadcastedTransactionState GetState(TransactionAggregate transaction)
+        private static BroadcastedTransactionState GetState(ITransactionAggregate transaction)
         {
             switch (transaction.State)
             {
