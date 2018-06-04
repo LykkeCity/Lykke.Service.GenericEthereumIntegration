@@ -5,6 +5,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Worker.Modules
 {
     public class GenericEthereumIntegrationWorkerModule : Module
     {
+        // ReSharper disable once NotAccessedField.Local
         private readonly GenericEthereumIntegrationWorkerSettings _settings;
 
         public GenericEthereumIntegrationWorkerModule(

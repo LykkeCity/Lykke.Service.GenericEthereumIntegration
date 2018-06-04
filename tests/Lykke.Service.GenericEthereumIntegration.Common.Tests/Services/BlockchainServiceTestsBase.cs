@@ -1,16 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
-using Lykke.Service.GenericEthereumIntegration.Common.Core.Services.DTOs;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Services.Interfaces;
-using Lykke.Service.GenericEthereumIntegration.Common.Core.Utils;
-using Lykke.Service.GenericEthereumIntegration.Common.Services;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Lykke.Service.GenericEthereumIntegration.TDK;
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Nethereum.Web3;
 
 
 namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
@@ -41,27 +36,87 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
         
         public virtual void BuildTransaction__ValidArgumentsPassed__TransactionBuilt()
         {
-            var actualResult = BlockchainService.BuildTransaction("0xEA674fdDe714fd979de3EdF0F56AA9716B898ec8", 2, 0, 2, 2);;
+            var actualResult = BlockchainService.BuildTransaction("0xEA674fdDe714fd979de3EdF0F56AA9716B898ec8", 2, 0, 2, 2);
 
-            Assert.AreEqual("0xdd80020294ea674fdde714fd979de3edf0f56aa9716b898ec80280808080", actualResult);
+            Assert.AreEqual("0x95c40102c40102c40102c40100d92a307845413637346664446537313466643937396465334564463046353641413937313642383938656338", actualResult);
         }
         
-        public virtual void BuildTransaction__IncalidArgumentsPassed__ExceptionThrown(string to, int amount, int nonce, int gasPrice, int gasAmount)
+        public virtual void BuildTransaction__InvalidArgumentsPassed__ExceptionThrown()
         {
+            const string to = nameof(to);
+            const string amount = nameof(amount);
+            const string nonce = nameof(nonce);
+            const string gasPrice = nameof(gasPrice);
+            const string gasAmount = nameof(gasAmount);
             
+            var testCasesGenerator = new TestCasesGenerator();
+
+            testCasesGenerator
+                .RegisterAddressParameter(to)
+                .RegisterParameter(amount, new []
+                {
+                    (-1, false),
+                    (0, false),
+                    (1, true),
+                })
+                .RegisterParameter(nonce, new []
+                {
+                    (-1, false),
+                    (0, true)
+                })
+                .RegisterParameter(gasPrice, new []
+                {
+                    (-1, false),
+                    (0, false),
+                    (1, true),
+                })
+                .RegisterParameter(gasAmount, new []
+                {
+                    (-1, false),
+                    (0, false),
+                    (1, true),
+                });
+            
+
+            foreach (var testCase in testCasesGenerator.Generate().Where(x => !x.IsValid))
+            {
+                Assert.ThrowsException<ArgumentException>
+                (
+                    () => BlockchainService.BuildTransaction
+                    (
+                        to: testCase.GetParameterValue<string>(to),
+                        amount: testCase.GetParameterValue<int>(amount),
+                        nonce: testCase.GetParameterValue<int>(nonce),
+                        gasPrice: testCase.GetParameterValue<int>(gasPrice),
+                        gasAmount: testCase.GetParameterValue<int>(gasAmount)
+                    )
+                );
+            }
         }
         
         #endregion
 
         #region CheckIfBroadcastedAsync
 
-        public virtual async Task CheckIfBroadcastedAsync__InvalidArgumentsPassed__ExceptionThrown(string txHash)
+        public virtual async Task CheckIfBroadcastedAsync__InvalidArgumentsPassed__ExceptionThrown()
         {
-            await Assert.ThrowsExceptionAsync<ArgumentException>
-            (
-                // ReSharper disable once AssignNullToNotNullAttribute
-                () => BlockchainService.CheckIfBroadcastedAsync(txHash)
-            );
+            const string txHash = nameof(txHash);
+            
+            var testCasesGenerator = new TestCasesGenerator();
+
+            testCasesGenerator
+                .RegisterHexStringParameter(txHash);
+            
+            foreach (var testCase in testCasesGenerator.Generate().Where(x => !x.IsValid))
+            {
+                await Assert.ThrowsExceptionAsync<ArgumentException>
+                (
+                    () => BlockchainService.CheckIfBroadcastedAsync
+                    (
+                        txHash: testCase.GetParameterValue<string>(txHash)
+                    )
+                );
+            }
         }
         
         #endregion
@@ -75,12 +130,33 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             Assert.IsTrue(actualResult > 0);
         }
         
-        public virtual async Task EstimateGasPriceAsync__InvalidArgumentsPassed__ExceptionThrown(string to, int amount)
+        public virtual async Task EstimateGasPriceAsync__InvalidArgumentsPassed__ExceptionThrown()
         {
-            await Assert.ThrowsExceptionAsync<ArgumentException>
-            (
-                () => BlockchainService.EstimateGasPriceAsync(to, amount)
-            );
+            const string to = nameof(to);
+            const string amount = nameof(amount);
+            
+            var testCasesGenerator = new TestCasesGenerator();
+
+            testCasesGenerator
+                .RegisterAddressParameter(to)
+                .RegisterParameter(amount, new []
+                {
+                    (-1, false),
+                    (0, false),
+                    (1, true)
+                });
+            
+            foreach (var testCase in testCasesGenerator.Generate().Where(x => !x.IsValid))
+            {
+                await Assert.ThrowsExceptionAsync<ArgumentException>
+                (
+                    () => BlockchainService.EstimateGasPriceAsync
+                    (
+                        to: testCase.GetParameterValue<string>(to),
+                        amount: testCase.GetParameterValue<int>(amount)
+                    )
+                );
+            }
         }
         
         #endregion
@@ -111,16 +187,32 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             );
         }
 
-        public virtual async Task GetBalanceAsync__InvalidArguemtnsPassed__ExceptionThrown(string address, int blockNumber)
+        public virtual async Task GetBalanceAsync__InvalidArguemtnsPassed__ExceptionThrown()
         {
-            await Assert.ThrowsExceptionAsync<ArgumentException>
-            (
-                () => BlockchainService.GetBalanceAsync
+            const string address = nameof(address);
+            const string blockNumber = nameof(blockNumber);
+            
+            var testCasesGenerator = new TestCasesGenerator();
+
+            testCasesGenerator
+                .RegisterAddressParameter(address)
+                .RegisterParameter(blockNumber, new []
+                {
+                    (-1, false),
+                    (0, true)
+                });
+            
+            foreach (var testCase in testCasesGenerator.Generate().Where(x => !x.IsValid))
+            {
+                await Assert.ThrowsExceptionAsync<ArgumentException>
                 (
-                    address,
-                    blockNumber
-                )
-            );
+                    () => BlockchainService.GetBalanceAsync
+                    (
+                        address: testCase.GetParameterValue<string>(address),
+                        blockNumber: testCase.GetParameterValue<int>(blockNumber)
+                    )
+                );
+            }
         }
         
         #endregion
@@ -142,12 +234,29 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             );
         }
         
-        public virtual async Task GetBlockHashAsync__InvalidArgumentsPassed__ExceptionThrown(int blockNumber)
+        public virtual async Task GetBlockHashAsync__InvalidArgumentsPassed__ExceptionThrown()
         {
-            await Assert.ThrowsExceptionAsync<ArgumentException>
-            (
-                () => BlockchainService.GetBlockHashAsync(blockNumber)
-            );
+            const string blockNumber = nameof(blockNumber);
+            
+            var testCasesGenerator = new TestCasesGenerator();
+
+            testCasesGenerator
+                .RegisterParameter(blockNumber, new []
+                {
+                    (-1, false),
+                    (0, true)
+                });
+            
+            foreach (var testCase in testCasesGenerator.Generate().Where(x => !x.IsValid))
+            {
+                await Assert.ThrowsExceptionAsync<ArgumentException>
+                (
+                    () => BlockchainService.GetBlockHashAsync
+                    (
+                        blockNumber: testCase.GetParameterValue<int>(blockNumber)
+                    )
+                );
+            }
         }
         
         #endregion
@@ -314,12 +423,25 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             );
         }
         
-        public virtual async Task GetCodeAsync__InvalidArgumentsPassed__ExceptionThrown(string address)
+        public virtual async Task GetCodeAsync__InvalidArgumentsPassed__ExceptionThrown()
         {
-            await Assert.ThrowsExceptionAsync<ArgumentException>
-            (
-                () => BlockchainService.GetCodeAsync(address)
-            );
+            const string address = nameof(address);
+            
+            var testCasesGenerator = new TestCasesGenerator();
+
+            testCasesGenerator
+                .RegisterAddressParameter(address);
+            
+            foreach (var testCase in testCasesGenerator.Generate().Where(x => !x.IsValid))
+            {
+                await Assert.ThrowsExceptionAsync<ArgumentException>
+                (
+                    () => BlockchainService.GetCodeAsync
+                    (
+                        address: testCase.GetParameterValue<string>(address)
+                    )
+                );
+            }
         }
 
         #endregion
@@ -352,12 +474,29 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             );
         }
         
-        public virtual async Task GetTimestampAsync__InvalidArgumentsPassed__ExceptionThrown(int blockNumber)
+        public virtual async Task GetTimestampAsync__InvalidArgumentsPassed__ExceptionThrown()
         {
-            await Assert.ThrowsExceptionAsync<ArgumentException>
-            (
-                () => BlockchainService.GetTimestampAsync(blockNumber)
-            );
+            const string blockNumber = nameof(blockNumber);
+            
+            var testCasesGenerator = new TestCasesGenerator();
+
+            testCasesGenerator
+                .RegisterParameter(blockNumber, new []
+                {
+                    (-1, false),
+                    (0, true)
+                });
+            
+            foreach (var testCase in testCasesGenerator.Generate().Where(x => !x.IsValid))
+            {
+                await Assert.ThrowsExceptionAsync<ArgumentException>
+                (
+                    () => BlockchainService.GetTimestampAsync
+                    (
+                        blockNumber: testCase.GetParameterValue<int>(blockNumber)
+                    )
+                );
+            }
         }
 
         #endregion
@@ -375,12 +514,25 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             Assert.AreEqual("0x54ff9c2645cbf4176b94871c07a9fed2f93ca179d99aaa5718a52815d1a40326", actualResult);
         }
         
-        public virtual void GetTransactionHash__InvalidArgumentsPassed__ExceptionThrown(string txData)
+        public virtual void GetTransactionHash__InvalidArgumentsPassed__ExceptionThrown()
         {
-            Assert.ThrowsException<ArgumentException>
-            (
-                () => BlockchainService.GetTransactionHash(txData)
-            );
+            const string signedTxData = nameof(signedTxData);
+            
+            var testCasesGenerator = new TestCasesGenerator();
+
+            testCasesGenerator
+                .RegisterHexStringParameter(signedTxData);
+            
+            foreach (var testCase in testCasesGenerator.Generate().Where(x => !x.IsValid))
+            {
+                Assert.ThrowsException<ArgumentException>
+                (
+                    () => BlockchainService.GetTransactionHash
+                    (
+                        signedTxData: testCase.GetParameterValue<string>(signedTxData)
+                    )
+                );
+            }
         }
         
         #endregion
@@ -423,12 +575,29 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             Assert.AreEqual(0, actualResult.Count());
         }
         
-        public virtual async Task GetTransactionsAsync__InvalidArgumentsPassed__ExceptionThrown(int blockNumber)
+        public virtual async Task GetTransactionsAsync__InvalidArgumentsPassed__ExceptionThrown()
         {
-            await Assert.ThrowsExceptionAsync<ArgumentException>
-            (
-                () => BlockchainService.GetTransactionsAsync(blockNumber)
-            );
+            const string blockNumber = nameof(blockNumber);
+            
+            var testCasesGenerator = new TestCasesGenerator();
+
+            testCasesGenerator
+                .RegisterParameter(blockNumber, new []
+                {
+                    (-1, false),
+                    (0, true)
+                });
+            
+            foreach (var testCase in testCasesGenerator.Generate().Where(x => !x.IsValid))
+            {
+                await Assert.ThrowsExceptionAsync<ArgumentException>
+                (
+                    () => BlockchainService.GetTransactionsAsync
+                    (
+                        blockNumber: testCase.GetParameterValue<int>(blockNumber)
+                    )
+                );
+            }
         }
         
         #endregion
@@ -437,31 +606,32 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
         
         public virtual void GetTransactionSigner__ValidArgumentsPassed__ValidTransactionSignerReturned()
         {
-            const string expectedResult = "0x1b3Ac7ed3b0BeEFcC5cDF857A3a25D4330d05AAc";
+            const string expectedResult = "0x312eBa96F6c89a49E8A7C920d9e981207FeCC8db";
 
-            var signedTxDatas = new[]
-            {
-                "f85d80020294ea674fdde714fd979de3edf0f56aa9716b898ec802801ba0710854a16dbcad522f92a7f9da5b0cf35f4" +
-                "1e41bd9959863042366fbf0e26fdca0557a2a0e4e3b01354de5633c4574c7c4d0749f3fdc5f24c0c9fc92f08d47a047",
-                
-                "0xf85d80020294ea674fdde714fd979de3edf0f56aa9716b898ec802801ba0710854a16dbcad522f92a7f9da5b0cf35f" +
-                "41e41bd9959863042366fbf0e26fdca0557a2a0e4e3b01354de5633c4574c7c4d0749f3fdc5f24c0c9fc92f08d47a047"
-            };
-
-            foreach (var signedTxData in signedTxDatas)
-            {
-                var actualResult = BlockchainService.GetTransactionSigner(signedTxData);
+            var actualResult = BlockchainService.GetTransactionSigner("0xf85d80020294ea674fdde714fd979de3edf0f56aa9716b898ec802801ca043d278a942c00b03c700c49d72d4f156fa672f9bf00f133393573236b7f5d008a00da8f47050ddc2d83dc858be2e2497e214fb05681d0f90963b21a30a85abb919");
             
-                Assert.AreEqual(expectedResult, actualResult);
-            }
+            Assert.AreEqual(expectedResult, actualResult);
         }
         
-        public virtual void GetTransactionSigner__InvalidArgumentsPassed__ExceptionThrown(string signedTxData)
+        public virtual void GetTransactionSigner__InvalidArgumentsPassed__ExceptionThrown()
         {
-            Assert.ThrowsException<ArgumentException>
-            (
-                () => BlockchainService.GetTransactionSigner(signedTxData)
-            );
+            const string signedTxData = nameof(signedTxData);
+            
+            var testCasesGenerator = new TestCasesGenerator();
+
+            testCasesGenerator
+                .RegisterHexStringParameter(signedTxData);
+            
+            foreach (var testCase in testCasesGenerator.Generate().Where(x => !x.IsValid))
+            {
+                Assert.ThrowsException<ArgumentException>
+                (
+                    () => BlockchainService.GetTransactionSigner
+                    (
+                        signedTxData: testCase.GetParameterValue<string>(signedTxData)
+                    )
+                );
+            }
         }
         
         public virtual void GetTransactionSigner__TransactionHasNotBeenSigned__ExceptionThrown()
@@ -486,12 +656,25 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
         
         #region SendRawTransactionAsync
 
-        public virtual async Task SendRawTransactionAsync__InvalidArgumentsPassed__ExceptionThrown(string signedTxData)
+        public virtual async Task SendRawTransactionAsync__InvalidArgumentsPassed__ExceptionThrown()
         {
-            await Assert.ThrowsExceptionAsync<ArgumentException>
-            (
-                () => BlockchainService.SendRawTransactionAsync(signedTxData)
-            );
+            const string signedTxData = nameof(signedTxData);
+            
+            var testCasesGenerator = new TestCasesGenerator();
+
+            testCasesGenerator
+                .RegisterHexStringParameter(signedTxData);
+            
+            foreach (var testCase in testCasesGenerator.Generate().Where(x => !x.IsValid))
+            {
+                await Assert.ThrowsExceptionAsync<ArgumentException>
+                (
+                    () => BlockchainService.SendRawTransactionAsync
+                    (
+                        signedTxData: testCase.GetParameterValue<string>(signedTxData)
+                    )
+                );
+            }
         }
         
         #endregion
@@ -531,13 +714,27 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             Assert.IsNull(actualResult);
         }
         
-        public virtual async Task TryGetTransactionErrorAsync__InvalidArgumentsPassed__ExceptionThrown(string txHash)
+        public virtual async Task TryGetTransactionErrorAsync__InvalidArgumentsPassed__ExceptionThrown()
         {
-            await Assert.ThrowsExceptionAsync<ArgumentException>
-            (
-                () => BlockchainService.TryGetTransactionErrorsAsync(txHash)
-            );
+            const string txHash = nameof(txHash);
+            
+            var testCasesGenerator = new TestCasesGenerator();
+
+            testCasesGenerator
+                .RegisterHexStringParameter(txHash);
+            
+            foreach (var testCase in testCasesGenerator.Generate().Where(x => !x.IsValid))
+            {
+                await Assert.ThrowsExceptionAsync<ArgumentException>
+                (
+                    () => BlockchainService.TryGetTransactionErrorsAsync
+                    (
+                        txHash: testCase.GetParameterValue<string>(txHash)
+                    )
+                );
+            }
         }
+        
         #endregion
         
         #region TryGetTransactionReceiptAsync
@@ -570,12 +767,25 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             Assert.IsNull(actualResult);
         }
         
-        public virtual async Task TryGetTransactionReceiptAsync__InvalidArgumentsPassed__ExceptionThrown(string txHash)
+        public virtual async Task TryGetTransactionReceiptAsync__InvalidArgumentsPassed__ExceptionThrown()
         {
-            await Assert.ThrowsExceptionAsync<ArgumentException>
-            (
-                () => BlockchainService.TryGetTransactionReceiptAsync(txHash)
-            );
+            const string txHash = nameof(txHash);
+            
+            var testCasesGenerator = new TestCasesGenerator();
+
+            testCasesGenerator
+                .RegisterHexStringParameter(txHash);
+            
+            foreach (var testCase in testCasesGenerator.Generate().Where(x => !x.IsValid))
+            {
+                await Assert.ThrowsExceptionAsync<ArgumentException>
+                (
+                    () => BlockchainService.TryGetTransactionReceiptAsync
+                    (
+                        txHash: testCase.GetParameterValue<string>(txHash)
+                    )
+                );
+            }
         }
         
         #endregion
@@ -590,15 +800,28 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
                 "41e41bd9959863042366fbf0e26fdca0557a2a0e4e3b01354de5633c4574c7c4d0749f3fdc5f24c0c9fc92f08d47a047"
             );
             
-            Assert.AreEqual("0xdd80020294ea674fdde714fd979de3edf0f56aa9716b898ec80280808080", actualResult);
+            Assert.AreEqual("0x95c40102c40102c40102c40100d92a307845413637346664446537313466643937396465334564463046353641413937313642383938656338", actualResult);
         }
 
-        public virtual async Task UnsignTransactionAsync__InvalidArgumentsPassed__ExceptionThrown(string signedTxData)
+        public virtual async Task UnsignTransactionAsync__InvalidArgumentsPassed__ExceptionThrown()
         {
-            await Assert.ThrowsExceptionAsync<ArgumentException>
-            (
-                () => BlockchainService.UnsignTransactionAsync(signedTxData)
-            );
+            const string signedTxData = nameof(signedTxData);
+            
+            var testCasesGenerator = new TestCasesGenerator();
+
+            testCasesGenerator
+                .RegisterHexStringParameter(signedTxData);
+            
+            foreach (var testCase in testCasesGenerator.Generate().Where(x => !x.IsValid))
+            {
+                await Assert.ThrowsExceptionAsync<ArgumentException>
+                (
+                    () => BlockchainService.UnsignTransactionAsync
+                    (
+                        signedTxData: testCase.GetParameterValue<string>(signedTxData)
+                    )
+                );
+            }
         }
         
         public virtual async Task UnsignTransactionAsync__TransactionHasData__ExceptionThrown()

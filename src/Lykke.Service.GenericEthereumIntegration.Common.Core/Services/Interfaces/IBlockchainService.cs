@@ -84,7 +84,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Core.Services.Interfac
         ///    Get the hash of the specified transaction.
         /// </summary>
         [NotNull, Pure]
-        string GetTransactionHash([NotNull] string txData);
+        string GetTransactionHash([NotNull] string signedTxData);
 
         /// <summary>
         ///    Get list of transactions in a block.

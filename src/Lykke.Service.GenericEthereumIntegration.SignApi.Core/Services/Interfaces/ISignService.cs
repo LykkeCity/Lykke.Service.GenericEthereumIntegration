@@ -4,7 +4,7 @@ namespace Lykke.Service.GenericEthereumIntegration.SignApi.Core.Services.Interfa
 {
     public interface ISignService
     {
-        [NotNull]
+        [Pure, NotNull]
         string SignTransaction([NotNull] string transactionHex, [NotNull] string privateKey);
     }
 }

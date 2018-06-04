@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using Lykke.Service.GenericEthereumIntegration.SignApi.Core.Services.DTOs;
 using Lykke.Service.GenericEthereumIntegration.SignApi.Core.Services.Interfaces;
 
@@ -12,10 +11,10 @@ namespace Lykke.Service.GenericEthereumIntegration.SignApi.Services
         {
             var key = Nethereum.Signer.EthECKey.GenerateKey();
 
-            return new WalletDto()
+            return new WalletDto
             {
                 PrivateKey = key.GetPrivateKey(),
-                PublicAddress = key.GetPublicAddress().ToLower()
+                PublicAddress = key.GetPublicAddress()
             };
         }
     }

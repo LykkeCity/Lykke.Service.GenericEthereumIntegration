@@ -341,12 +341,14 @@ namespace Lykke.Service.GenericEthereumIntegration.Common
 
             aggregateLogger.AddLog(azureStorageLogger);
 
+            // ReSharper disable RedundantArgumentDefaultValue
             var allMessagesSlackLogger = LykkeLogToSlack.Create
             (
                 slackService,
                 "BlockChainIntegration",
                 LogLevel.All
             );
+            // ReSharper restore RedundantArgumentDefaultValue
 
             aggregateLogger.AddLog(allMessagesSlackLogger);
 

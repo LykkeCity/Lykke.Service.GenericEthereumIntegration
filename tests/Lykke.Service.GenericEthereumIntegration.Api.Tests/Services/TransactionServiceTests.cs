@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Lykke.Common.Chaos;
 using Lykke.Service.GenericEthereumIntegration.Api.Core.Exceptions;
 using Lykke.Service.GenericEthereumIntegration.Api.Core.Settings.Service;
@@ -15,13 +17,13 @@ using Lykke.Service.GenericEthereumIntegration.Common.Core.Repositories.Interfac
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Services.Interfaces;
 using Lykke.Service.GenericEthereumIntegration.TDK;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Microsoft.WindowsAzure.Storage.Blob.Protocol;
 using Moq;
 
 
 namespace Lykke.Service.GenericEthereumIntegration.Api.Tests.Services
 {
     [TestClass]
+    [SuppressMessage("ReSharper", "RedundantBoolCompare")]
     public class TransactionServiceTests
     {
         #region BroadcastTransactionAsync
@@ -594,6 +596,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Tests.Services
             return $"0x{Guid.NewGuid():N}";
         }
         
+        [PublicAPI]
         private class TransactionServiceBuilder
         {
             private string _buildTransactionResult;

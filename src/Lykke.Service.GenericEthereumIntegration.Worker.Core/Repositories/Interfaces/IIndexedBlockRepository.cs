@@ -13,7 +13,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Worker.Core.Repositories.Inte
         [ItemNotNull]
         Task<IEnumerable<IndexedBlockDto>> GetAsync([NotNull] IEnumerable<BigInteger> blockNumbers);
 
-        [ItemNotNull]
+        [ItemCanBeNull]
         Task<IndexedBlockDto> TryGetAsync(BigInteger blockNumber);
     }
 }

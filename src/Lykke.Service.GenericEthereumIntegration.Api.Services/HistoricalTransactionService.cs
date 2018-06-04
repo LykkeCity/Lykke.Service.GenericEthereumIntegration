@@ -7,7 +7,6 @@ using Lykke.Service.GenericEthereumIntegration.Common.Core.Exceptions;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Repositories.DTOs;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Repositories.Interfaces;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Settings.Integration;
-using Lykke.Service.GenericEthereumIntegration.Common.Core.Settings.Service;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Utils;
 
 

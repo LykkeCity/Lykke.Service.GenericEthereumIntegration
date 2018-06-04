@@ -11,7 +11,6 @@ using Lykke.Service.GenericEthereumIntegration.Common.Services.Models.Parity;
 using Nethereum.Hex.HexTypes;
 using Nethereum.JsonRpc.Client;
 using Nethereum.Parity;
-using Newtonsoft.Json.Linq;
 
 
 namespace Lykke.Service.GenericEthereumIntegration.Common.Services

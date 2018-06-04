@@ -4,10 +4,9 @@ using JetBrains.Annotations;
 using Lykke.Service.GenericEthereumIntegration.SignApi.Core.Settings;
 using Lykke.Service.GenericEthereumIntegration.SignApi.Services.Modules;
 using Lykke.SettingsReader;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+
 
 namespace Lykke.Service.GenericEthereumIntegration.SignApi
 {

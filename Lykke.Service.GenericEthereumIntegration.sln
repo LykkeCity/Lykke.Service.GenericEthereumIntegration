@@ -55,6 +55,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lykke.Service.GenericEthere
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lykke.Service.GenericEthereumIntegration.TDK", "tests\Lykke.Service.GenericEthereumIntegration.TDK\Lykke.Service.GenericEthereumIntegration.TDK.csproj", "{9F075960-A9A1-499B-916E-59103F2A6D3B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lykke.Service.GenericEthereumIntegration.SignApi.Tests", "tests\Lykke.Service.GenericEthereumIntegration.SignApi.Tests\Lykke.Service.GenericEthereumIntegration.SignApi.Tests.csproj", "{D9DEA6E7-27AB-41C4-9B2F-2018FB515401}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -141,6 +143,10 @@ Global
 		{9F075960-A9A1-499B-916E-59103F2A6D3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9F075960-A9A1-499B-916E-59103F2A6D3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9F075960-A9A1-499B-916E-59103F2A6D3B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D9DEA6E7-27AB-41C4-9B2F-2018FB515401}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9DEA6E7-27AB-41C4-9B2F-2018FB515401}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9DEA6E7-27AB-41C4-9B2F-2018FB515401}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9DEA6E7-27AB-41C4-9B2F-2018FB515401}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -170,6 +176,7 @@ Global
 		{6D9DC459-7855-4385-95F1-C648D5B78634} = {52058FEB-DBF5-4DFD-9C1C-3C6C20E6A603}
 		{44D64CA6-FD51-42CD-9CC7-CE870134D440} = {52058FEB-DBF5-4DFD-9C1C-3C6C20E6A603}
 		{9F075960-A9A1-499B-916E-59103F2A6D3B} = {8A5F5C7A-5CF5-4F06-A41A-02DE18B05920}
+		{D9DEA6E7-27AB-41C4-9B2F-2018FB515401} = {8A5F5C7A-5CF5-4F06-A41A-02DE18B05920}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DFEBA222-ED94-4F12-8D1C-F15C00B975DC}

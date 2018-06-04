@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Tracing;
 using System.Numerics;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
@@ -7,6 +8,7 @@ using Lykke.Service.GenericEthereumIntegration.Common.Core.Exceptions;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Services.DTOs;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Services.Interfaces;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Utils;
+using MessagePack;
 using Nethereum.Hex.HexConvertors.Extensions;
 using Nethereum.Hex.HexTypes;
 using Nethereum.JsonRpc.Client;
@@ -68,18 +70,18 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Services
             }
             
             #endregion
-            
-            var transaction = new Transaction
-            (
-                to: to,
-                amount: amount,
-                nonce: nonce,
-                gasPrice: gasPrice,
-                gasLimit: gasAmount
-            );
 
-            return transaction
-                .GetRLPEncoded()
+            var transaction = new UnsignedTransactionDto
+            {
+                Amount = amount,
+                GasAmount = gasAmount,
+                GasPrice = gasPrice,
+                Nonce = nonce,
+                To = to
+            };
+
+            return MessagePackSerializer
+                .Serialize(transaction)
                 .ToHex(prefix: true);
         }
         
@@ -241,23 +243,23 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Services
         public abstract Task<IEnumerable<string>> TryGetTransactionErrorsAsync(string txHash);
         
         /// <inheritdoc />
-        public string GetTransactionHash(string txData)
+        public string GetTransactionHash(string signedTxData)
         {
             #region Validation
             
-            if (txData.IsNullOrEmpty())
+            if (signedTxData.IsNullOrEmpty())
             {
-                throw new ArgumentException(CommonExceptionMessages.ShouldNotBeNullOrEmpty, nameof(txData));
+                throw new ArgumentException(CommonExceptionMessages.ShouldNotBeNullOrEmpty, nameof(signedTxData));
             }
 
-            if (txData.IsNotHexString())
+            if (signedTxData.IsNotHexString())
             {
-                throw new ArgumentException(CommonExceptionMessages.ShouldBeValidHexString, nameof(txData));
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeValidHexString, nameof(signedTxData));
             }
             
             #endregion
 
-            var txDataBytes = HexToBytesArray(txData);
+            var txDataBytes = HexToBytesArray(signedTxData);
             
             return (new Transaction(txDataBytes)).RawHash
                 .ToHex(true);

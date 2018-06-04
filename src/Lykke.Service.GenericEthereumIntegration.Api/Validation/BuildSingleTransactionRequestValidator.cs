@@ -3,7 +3,6 @@ using FluentValidation;
 using JetBrains.Annotations;
 using Lykke.Service.BlockchainApi.Contract.Transactions;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Settings.Integration;
-using Lykke.Service.GenericEthereumIntegration.Common.Core.Settings.Service;
 
 
 namespace Lykke.Service.GenericEthereumIntegration.Api.Validation

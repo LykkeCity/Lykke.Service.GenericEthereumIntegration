@@ -8,7 +8,6 @@ using Lykke.Service.GenericEthereumIntegration.Api.Repositories.Modules;
 using Lykke.Service.GenericEthereumIntegration.Api.Services.Modules;
 using Lykke.Service.GenericEthereumIntegration.Common.Filters;
 using Lykke.SettingsReader;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

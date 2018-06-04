@@ -4,7 +4,6 @@ using Lykke.Service.GenericEthereumIntegration.Api.Services.Strategies;
 using Lykke.Service.GenericEthereumIntegration.Api.Services.Strategies.Interfaces;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Services.Interfaces;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Settings.Integration;
-using Lykke.Service.GenericEthereumIntegration.Common.Core.Settings.Service;
 using Lykke.Service.GenericEthereumIntegration.Common.Services.Factories;
 
 namespace Lykke.Service.GenericEthereumIntegration.Api.Services.Modules

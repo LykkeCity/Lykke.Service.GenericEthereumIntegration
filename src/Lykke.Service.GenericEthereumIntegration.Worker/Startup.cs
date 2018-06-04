@@ -14,10 +14,8 @@ using Lykke.Service.GenericEthereumIntegration.Worker.Modules;
 using Lykke.Service.GenericEthereumIntegration.Worker.Repositories.Modules;
 using Lykke.Service.GenericEthereumIntegration.Worker.Services.Modules;
 using Lykke.SettingsReader;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
+
 
 namespace Lykke.Service.GenericEthereumIntegration.Worker
 {

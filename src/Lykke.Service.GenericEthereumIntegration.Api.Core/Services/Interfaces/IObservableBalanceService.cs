@@ -11,6 +11,6 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Core.Services.Interfaces
 
         Task EndObservationAsync([NotNull] string address);
 
-        Task<(IEnumerable<ObservableBalanceDto> balances, string assetId, string continuationToken)> GetBalancesAsync(int take, string continuationToken);
+        Task<(IEnumerable<ObservableBalanceDto> Balances, string AssetId, string ContinuationToken)> GetBalancesAsync(int take, string continuationToken);
     }
 }

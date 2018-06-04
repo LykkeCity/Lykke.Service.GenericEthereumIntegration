@@ -1,5 +1,5 @@
-﻿using System.Threading.Tasks;
-using Lykke.Service.GenericEthereumIntegration.Worker.Core.Repositories.DTOs;
+﻿using Lykke.Service.GenericEthereumIntegration.Worker.Core.Repositories.DTOs;
+
 
 namespace Lykke.Service.GenericEthereumIntegration.Worker.Core.Repositories.Interfaces
 {

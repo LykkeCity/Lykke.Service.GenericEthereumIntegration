@@ -61,6 +61,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Worker.Actors
                 ProcessMessageWhenIdleAsync);
         }
 
+        // ReSharper disable once UnusedParameter.Local
         private void ProcessMessageWhenIdle(Shutdown message)
         {
             Context.Stop(Self);
@@ -99,6 +100,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Worker.Actors
                 ProcessMessageWhenBusyAsync);
         }
 
+        // ReSharper disable once UnusedParameter.Local
         private void ProcessMessageWhenBusy(Shutdown message)
         {
             _shutdownReceived = true;

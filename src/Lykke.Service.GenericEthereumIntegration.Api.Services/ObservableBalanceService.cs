@@ -21,8 +21,8 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
 
 
         public ObservableBalanceService(
-            AssetSettings assetSettings,
-            IObservableBalanceRepository observableBalanceRepository)
+            [NotNull] AssetSettings assetSettings,
+            [NotNull] IObservableBalanceRepository observableBalanceRepository)
         {
             _assetSettings = assetSettings;
             _observableBalanceRepository = observableBalanceRepository;
@@ -77,7 +77,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
             throw new NotFoundException($"Specified address [{address}] has not been found in the observation list.");
         }
 
-        public async Task<(IEnumerable<ObservableBalanceDto> balances, string assetId, string continuationToken)> GetBalancesAsync(int take, string continuationToken)
+        public async Task<(IEnumerable<ObservableBalanceDto> Balances, string AssetId, string ContinuationToken)> GetBalancesAsync(int take, string continuationToken)
         {
             #region Validation
             

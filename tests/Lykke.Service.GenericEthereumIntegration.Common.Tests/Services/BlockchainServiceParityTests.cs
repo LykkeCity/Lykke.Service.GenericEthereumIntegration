@@ -29,30 +29,16 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             base.BuildTransaction__ValidArgumentsPassed__TransactionBuilt();
         }
         
-        [DataTestMethod]
-        [DataRow(null, 1, 0, 1, 1)]                                             // to is null
-        [DataRow("",   1, 0, 1, 1)]                                             // to is empty
-        [DataRow("0xea674fdDe714fd979de3EdF0F56AA9716B898ec8",  1,  0,  1,  1)] // to is invalid
-        [DataRow("0xEA674fdDe714fd979de3EdF0F56AA9716B898ec8",  0,  0,  1,  1)] // amount == 0
-        [DataRow("0xEA674fdDe714fd979de3EdF0F56AA9716B898ec8", -1,  0,  1,  1)] // amount < 0
-        [DataRow("0xEA674fdDe714fd979de3EdF0F56AA9716B898ec8",  1, -1,  1,  1)] // none < 0
-        [DataRow("0xEA674fdDe714fd979de3EdF0F56AA9716B898ec8",  1,  0,  0,  1)] // gasPrice == 0
-        [DataRow("0xEA674fdDe714fd979de3EdF0F56AA9716B898ec8",  1,  0, -1,  1)] // gasPrice < 0
-        [DataRow("0xEA674fdDe714fd979de3EdF0F56AA9716B898ec8",  1,  0,  1,  0)] // gasAmount == 0
-        [DataRow("0xEA674fdDe714fd979de3EdF0F56AA9716B898ec8",  1,  0,  1, -1)] // gasAmount < 0
-        public override void BuildTransaction__IncalidArgumentsPassed__ExceptionThrown(string to, int amount, int nonce, int gasPrice, int gasAmount)
+        [TestMethod]
+        public override void BuildTransaction__InvalidArgumentsPassed__ExceptionThrown()
         {
-            base.BuildTransaction__IncalidArgumentsPassed__ExceptionThrown(to, amount, nonce, gasPrice, gasAmount);
+            base.BuildTransaction__InvalidArgumentsPassed__ExceptionThrown();
         }
         
-        [DataTestMethod]
-        [DataRow(null)]
-        [DataRow("")]
-        [DataRow("0xA")]
-        [DataRow("0xZe")]
-        public override async Task CheckIfBroadcastedAsync__InvalidArgumentsPassed__ExceptionThrown(string txHash)
+        [TestMethod]
+        public override async Task CheckIfBroadcastedAsync__InvalidArgumentsPassed__ExceptionThrown()
         {
-            await base.CheckIfBroadcastedAsync__InvalidArgumentsPassed__ExceptionThrown(txHash);
+            await base.CheckIfBroadcastedAsync__InvalidArgumentsPassed__ExceptionThrown();
         }
 
         [TestMethod]
@@ -61,15 +47,10 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             await base.EstimateGasPriceAsync__ValidArgumentsPassed__TransactionBuilt();
         }
 
-        [DataTestMethod]
-        [DataRow(null, 1)]                                          // to is null
-        [DataRow("",   1)]                                          // to is empty
-        [DataRow("0xea674fdDe714fd979de3EdF0F56AA9716B898ec8",  1)] // to is invalid
-        [DataRow("0xEA674fdDe714fd979de3EdF0F56AA9716B898ec8",  0)] // amount == 0
-        [DataRow("0xEA674fdDe714fd979de3EdF0F56AA9716B898ec8", -1)] // amount < 0
-        public override async Task EstimateGasPriceAsync__InvalidArgumentsPassed__ExceptionThrown(string to, int amount)
+        [TestMethod]
+        public override async Task EstimateGasPriceAsync__InvalidArgumentsPassed__ExceptionThrown()
         {
-            await base.EstimateGasPriceAsync__InvalidArgumentsPassed__ExceptionThrown(to, amount);
+            await base.EstimateGasPriceAsync__InvalidArgumentsPassed__ExceptionThrown();
         }
         
         [TestMethod]
@@ -84,14 +65,10 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             await base.GetBalanceAsync__ValidArgumentsPassed_And_BlockDoesNotExist__ExceptionThrown();
         }
 
-        [DataTestMethod]
-        [DataRow(null, 1)]                                          // address is null
-        [DataRow("",   1)]                                          // address is empty
-        [DataRow("0xea674fdDe714fd979de3EdF0F56AA9716B898ec8",  1)] // address is invalid
-        [DataRow("0xEA674fdDe714fd979de3EdF0F56AA9716B898ec8", -1)] // blockNumber < 0
-        public override async Task GetBalanceAsync__InvalidArguemtnsPassed__ExceptionThrown(string address, int blockNumber)
+        [TestMethod]
+        public override async Task GetBalanceAsync__InvalidArguemtnsPassed__ExceptionThrown()
         {
-            await base.GetBalanceAsync__InvalidArguemtnsPassed__ExceptionThrown(address, blockNumber);
+            await base.GetBalanceAsync__InvalidArguemtnsPassed__ExceptionThrown();
         }
 
         [TestMethod]
@@ -106,11 +83,10 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             await base.GetBlockHashAsync__ValidArgumentsPassed_And_BlockDoesNotExist__ExceptionThrown();
         }
 
-        [DataTestMethod]
-        [DataRow(-1)] // blockNumber < 0
-        public override async Task GetBlockHashAsync__InvalidArgumentsPassed__ExceptionThrown(int blockNumber)
+        [TestMethod]
+        public override async Task GetBlockHashAsync__InvalidArgumentsPassed__ExceptionThrown()
         {
-            await base.GetBlockHashAsync__InvalidArgumentsPassed__ExceptionThrown(blockNumber);
+            await base.GetBlockHashAsync__InvalidArgumentsPassed__ExceptionThrown();
         }
 
         [TestMethod]
@@ -125,13 +101,10 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             await base.GetCodeAsync__AddressIsContract__ValidCodeReturned();
         }
 
-        [DataTestMethod]
-        [DataRow(null)]                                         // address is null
-        [DataRow("")]                                           // address is empty
-        [DataRow("0xea674fdDe714fd979de3EdF0F56AA9716B898ec8")] // address is invalid
-        public override async Task GetCodeAsync__InvalidArgumentsPassed__ExceptionThrown(string address)
+        [TestMethod]
+        public override async Task GetCodeAsync__InvalidArgumentsPassed__ExceptionThrown()
         {
-            await base.GetCodeAsync__InvalidArgumentsPassed__ExceptionThrown(address);
+            await base.GetCodeAsync__InvalidArgumentsPassed__ExceptionThrown();
         }
 
         [TestMethod]
@@ -152,11 +125,10 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             await base.GetTimestampAsync__ValidArgumentsPassed_And_BlockDoesNotExist__ExceptionThrown();
         }
 
-        [DataTestMethod]
-        [DataRow(-1)] // blockNumber < 0
-        public override async Task GetTimestampAsync__InvalidArgumentsPassed__ExceptionThrown(int blockNumber)
+        [TestMethod]
+        public override async Task GetTimestampAsync__InvalidArgumentsPassed__ExceptionThrown()
         {
-            await base.GetTimestampAsync__InvalidArgumentsPassed__ExceptionThrown(blockNumber);
+            await base.GetTimestampAsync__InvalidArgumentsPassed__ExceptionThrown();
         }
 
         [TestMethod]
@@ -165,14 +137,10 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             base.GetTransactionHash__ValidTransactionDataPassed__ValidTransactionHashReturned();
         }
         
-        [DataTestMethod]
-        [DataRow(null)]
-        [DataRow("")]
-        [DataRow("0xA")]
-        [DataRow("0xZe")]
-        public override void GetTransactionHash__InvalidArgumentsPassed__ExceptionThrown(string txData)
+        [TestMethod]
+        public override void GetTransactionHash__InvalidArgumentsPassed__ExceptionThrown()
         {
-            base.GetTransactionHash__InvalidArgumentsPassed__ExceptionThrown(txData);
+            base.GetTransactionHash__InvalidArgumentsPassed__ExceptionThrown();
         }
 
         [TestMethod]
@@ -187,11 +155,10 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             await base.GetTransactionsAsync__BlockIsEmpty__EmptyTransactionListReturned();
         }
 
-        [DataTestMethod]
-        [DataRow(-1)] // blockNumber < 0
-        public override async Task GetTransactionsAsync__InvalidArgumentsPassed__ExceptionThrown(int blockNumber)
+        [TestMethod]
+        public override async Task GetTransactionsAsync__InvalidArgumentsPassed__ExceptionThrown()
         {
-            await base.GetTransactionsAsync__InvalidArgumentsPassed__ExceptionThrown(blockNumber);
+            await base.GetTransactionsAsync__InvalidArgumentsPassed__ExceptionThrown();
         }
 
 
@@ -201,14 +168,10 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             base.GetTransactionSigner__ValidArgumentsPassed__ValidTransactionSignerReturned();
         }
 
-        [DataTestMethod]
-        [DataRow(null)]
-        [DataRow("")]
-        [DataRow("0xA")]
-        [DataRow("0xZe")]
-        public override void GetTransactionSigner__InvalidArgumentsPassed__ExceptionThrown(string signedTxData)
+        [TestMethod]
+        public override void GetTransactionSigner__InvalidArgumentsPassed__ExceptionThrown()
         {
-            base.GetTransactionSigner__InvalidArgumentsPassed__ExceptionThrown(signedTxData);
+            base.GetTransactionSigner__InvalidArgumentsPassed__ExceptionThrown();
         }
 
         [TestMethod]
@@ -217,14 +180,10 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             base.GetTransactionSigner__TransactionHasNotBeenSigned__ExceptionThrown();
         }
 
-        [DataTestMethod]
-        [DataRow(null)]
-        [DataRow("")]
-        [DataRow("0xA")]
-        [DataRow("0xZe")]
-        public override async Task SendRawTransactionAsync__InvalidArgumentsPassed__ExceptionThrown(string signedTxData)
+        [TestMethod]
+        public override async Task SendRawTransactionAsync__InvalidArgumentsPassed__ExceptionThrown()
         {
-            await base.SendRawTransactionAsync__InvalidArgumentsPassed__ExceptionThrown(signedTxData);
+            await base.SendRawTransactionAsync__InvalidArgumentsPassed__ExceptionThrown();
         }
 
         [TestMethod]
@@ -245,14 +204,10 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             await base.TryGetTransactionErrorAsync__TransactionDoesNotExist__NullReturned();
         }
 
-        [DataTestMethod]
-        [DataRow(null)]
-        [DataRow("")]
-        [DataRow("0xA")]
-        [DataRow("0xZe")]
-        public override async Task TryGetTransactionErrorAsync__InvalidArgumentsPassed__ExceptionThrown(string txHash)
+        [TestMethod]
+        public override async Task TryGetTransactionErrorAsync__InvalidArgumentsPassed__ExceptionThrown()
         {
-            await base.TryGetTransactionErrorAsync__InvalidArgumentsPassed__ExceptionThrown(txHash);
+            await base.TryGetTransactionErrorAsync__InvalidArgumentsPassed__ExceptionThrown();
         }
 
         [TestMethod]
@@ -267,14 +222,10 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             await base.TryGetTransactionReceiptAsync__NonExistingTxHashPassed__NullReturned();
         }
 
-        [DataTestMethod]
-        [DataRow(null)]
-        [DataRow("")]
-        [DataRow("0xA")]
-        [DataRow("0xZe")]
-        public override async Task TryGetTransactionReceiptAsync__InvalidArgumentsPassed__ExceptionThrown(string txHash)
+        [TestMethod]
+        public override async Task TryGetTransactionReceiptAsync__InvalidArgumentsPassed__ExceptionThrown()
         {
-            await base.TryGetTransactionReceiptAsync__InvalidArgumentsPassed__ExceptionThrown(txHash);
+            await base.TryGetTransactionReceiptAsync__InvalidArgumentsPassed__ExceptionThrown();
         }
 
         [TestMethod]
@@ -283,14 +234,10 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             await base.UnsignTransactionAsync__ValidArgumentsPassed__ValidUnsignedTxDataReturned();
         }
 
-        [DataTestMethod]
-        [DataRow(null)]
-        [DataRow("")]
-        [DataRow("0xA")]
-        [DataRow("0xZe")]
-        public override async Task UnsignTransactionAsync__InvalidArgumentsPassed__ExceptionThrown(string signedTxData)
+        [TestMethod]
+        public override async Task UnsignTransactionAsync__InvalidArgumentsPassed__ExceptionThrown()
         {
-            await base.UnsignTransactionAsync__InvalidArgumentsPassed__ExceptionThrown(signedTxData);
+            await base.UnsignTransactionAsync__InvalidArgumentsPassed__ExceptionThrown();
         }
 
         [TestMethod]
