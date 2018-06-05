@@ -165,12 +165,12 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Repositories
                 .Select(ConvertToDto);
         }
 
-        public Task<IEnumerable<HistoricalTransactionDto>> GetIncomingHistory(string address, int take, string afterHash)
+        public Task<IEnumerable<HistoricalTransactionDto>> GetIncomingHistoryAsync(string address, int take, string afterHash)
         {
             return GetAddressHistory(_toAddressIndexTable, address, take, afterHash);
         }
 
-        public Task<IEnumerable<HistoricalTransactionDto>> GetOutgoingHistory(string address, int take, string afterHash)
+        public Task<IEnumerable<HistoricalTransactionDto>> GetOutgoingHistoryAsync(string address, int take, string afterHash)
         {
             return GetAddressHistory(_fromAddressIndexTable, address, take, afterHash);
         }

@@ -7,8 +7,8 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Core.Services.Interfaces
 {
     public interface IHistoricalTransactionService
     {
-        Task<(IEnumerable<HistoricalTransactionDto> transactions, string assetId)> GetIncomingHistoryAsync([NotNull] string address, int take, string afterHash);
+        Task<(IEnumerable<HistoricalTransactionDto> Transactions, string AssetId)> GetIncomingHistoryAsync([NotNull] string address, int take, string afterHash);
 
-        Task<(IEnumerable<HistoricalTransactionDto> transactions, string assetId)> GetOutgoingHistoryAsync([NotNull] string address, int take, string afterHash);
+        Task<(IEnumerable<HistoricalTransactionDto> Transactions, string AssetId)> GetOutgoingHistoryAsync([NotNull] string address, int take, string afterHash);
     }
 }

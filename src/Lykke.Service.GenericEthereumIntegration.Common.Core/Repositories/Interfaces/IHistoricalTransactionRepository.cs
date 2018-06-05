@@ -14,10 +14,10 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Core.Repositories.Inte
         Task<IEnumerable<HistoricalTransactionDto>> GetBlockHistoryAsync(BigInteger blockNumber);
 
         [ItemNotNull]
-        Task<IEnumerable<HistoricalTransactionDto>> GetIncomingHistory([NotNull] string address, int take, string afterHash);
+        Task<IEnumerable<HistoricalTransactionDto>> GetIncomingHistoryAsync([NotNull] string address, int take, string afterHash);
 
         [ItemNotNull]
-        Task<IEnumerable<HistoricalTransactionDto>> GetOutgoingHistory([NotNull] string address, int take, string afterHash);
+        Task<IEnumerable<HistoricalTransactionDto>> GetOutgoingHistoryAsync([NotNull] string address, int take, string afterHash);
 
         Task ClearBlockAsync(BigInteger blockNumber);
     }

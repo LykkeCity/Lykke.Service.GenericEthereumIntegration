@@ -28,7 +28,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
         }
 
 
-        public async Task<(IEnumerable<HistoricalTransactionDto> transactions, string assetId)> GetIncomingHistoryAsync(string address, int take, string afterHash)
+        public async Task<(IEnumerable<HistoricalTransactionDto> Transactions, string AssetId)> GetIncomingHistoryAsync(string address, int take, string afterHash)
         {
             #region Validation
             
@@ -49,12 +49,12 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
             
             #endregion
             
-            var transactions = await _historicalTransactionRepository.GetIncomingHistory(address, take, afterHash);
+            var transactions = await _historicalTransactionRepository.GetIncomingHistoryAsync(address, take, afterHash);
 
             return (transactions, _assetSettings.Id);
         }
 
-        public async Task<(IEnumerable<HistoricalTransactionDto> transactions, string assetId)> GetOutgoingHistoryAsync(string address, int take, string afterHash)
+        public async Task<(IEnumerable<HistoricalTransactionDto> Transactions, string AssetId)> GetOutgoingHistoryAsync(string address, int take, string afterHash)
         {
             #region Validation
             
@@ -75,7 +75,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
             
             #endregion
             
-            var transactions = await _historicalTransactionRepository.GetOutgoingHistory(address, take, afterHash);
+            var transactions = await _historicalTransactionRepository.GetOutgoingHistoryAsync(address, take, afterHash);
 
             return (transactions, _assetSettings.Id);
         }
