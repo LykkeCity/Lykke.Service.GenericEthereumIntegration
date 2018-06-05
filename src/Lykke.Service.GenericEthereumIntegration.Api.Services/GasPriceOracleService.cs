@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Numerics;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Lykke.Service.GenericEthereumIntegration.Api.Core.Repositories.Interfaces;
 using Lykke.Service.GenericEthereumIntegration.Api.Core.Services.Interfaces;
 using Lykke.Service.GenericEthereumIntegration.Api.Core.Settings.Service;
@@ -19,9 +20,9 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
 
 
         public GasPriceOracleService(
-            IBlockchainService blockchainService,
-            IGasPriceRepository gasPriceRepository,
-            ApiSettings settings)
+            [NotNull] IBlockchainService blockchainService,
+            [NotNull] IGasPriceRepository gasPriceRepository,
+            [NotNull] ApiSettings settings)
         {
             _blockchainService = blockchainService;
             _defaultMaxGasPrice = BigInteger.Parse(settings.DefaultMaxGasPrice);
@@ -29,7 +30,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
             _gasPriceRepository = gasPriceRepository;
         }
 
-
+        
         public async Task<BigInteger> CalculateGasPriceAsync(string to, BigInteger amount)
         {
             #region Validation

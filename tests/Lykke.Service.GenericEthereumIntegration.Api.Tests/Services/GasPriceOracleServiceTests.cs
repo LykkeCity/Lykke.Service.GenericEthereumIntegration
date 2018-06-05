@@ -1,11 +1,14 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 using System.Threading.Tasks;
 using Lykke.Service.GenericEthereumIntegration.Api.Core.Repositories.Interfaces;
 using Lykke.Service.GenericEthereumIntegration.Api.Core.Settings.Service;
 using Lykke.Service.GenericEthereumIntegration.Api.Services;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Services.Interfaces;
+using Lykke.Service.GenericEthereumIntegration.TDK;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+
 
 namespace Lykke.Service.GenericEthereumIntegration.Api.Tests.Services
 {
@@ -16,13 +19,53 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Tests.Services
         private const string MaxGasPrice = "80000000000";
 
 
+        [TestMethod]
+        public async Task CalculateGasPriceAsync__InvalidArgumentsPassed__ExceptionThrown()
+        {
+            const string to = nameof(to);
+            const string amount = nameof(amount);
+            
+            var testCasesGenerator = new TestCasesGenerator();
+
+            testCasesGenerator
+                .RegisterAddressParameter(to)
+                .RegisterParameter(amount, new[]
+                {
+                    (-1, false),
+                    (0, false),
+                    (1, true)
+                });
+            
+            // ReSharper disable AssignNullToNotNullAttribute
+            var settings = new ApiSettings
+            {
+                DefaultMaxGasPrice = MaxGasPrice,
+                DefaultMinGasPrice = MinGasPrice
+            };
+            
+            var service = new GasPriceOracleService(null, null, settings);
+            // ReSharper restore AssignNullToNotNullAttribute
+
+            foreach (var testCase in testCasesGenerator.GenerateInvalidCases())
+            {
+                await Assert.ThrowsExceptionAsync<ArgumentException>
+                (
+                    () => service.CalculateGasPriceAsync
+                    (
+                        to: testCase.GetParameterValue<string>(to),
+                        amount: testCase.GetParameterValue<int>(amount)
+                    )
+                );
+            }
+        }
+        
 
         [DataTestMethod]
         [DataRow("10000000000", MinGasPrice)]
         [DataRow("70000000000", "70000000000")]
         [DataRow("90000000000", MaxGasPrice)]
 
-        public async Task CalculateGasPriceAsync__ValidResultReturned(
+        public async Task CalculateGasPriceAsync__ValidArgumentsPassed__ValidResultReturned(
             string estimatedGasPrice,
             string expectedResult)
         {
