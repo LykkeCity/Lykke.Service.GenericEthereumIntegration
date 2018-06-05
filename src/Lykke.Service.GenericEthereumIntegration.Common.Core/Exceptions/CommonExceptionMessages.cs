@@ -10,6 +10,8 @@
         
         public const string ShouldBeValidHexString = "Should be valid hex string.";
         
+        public const string ShouldBeGreaterThanOne = "Should be greater than one.";
+        
         public const string ShouldBeGreaterThanZero = "Should be greater than zero.";
         
         public const string ShouldNotBeNullOrEmpty = "Should not be null or empty.";   

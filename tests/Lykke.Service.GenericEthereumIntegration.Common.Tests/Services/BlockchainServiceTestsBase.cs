@@ -78,7 +78,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
                 });
             
 
-            foreach (var testCase in testCasesGenerator.Generate().Where(x => !x.IsValid))
+            foreach (var testCase in testCasesGenerator.GenerateInvalidCases())
             {
                 Assert.ThrowsException<ArgumentException>
                 (
@@ -107,7 +107,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             testCasesGenerator
                 .RegisterHexStringParameter(txHash);
             
-            foreach (var testCase in testCasesGenerator.Generate().Where(x => !x.IsValid))
+            foreach (var testCase in testCasesGenerator.GenerateInvalidCases())
             {
                 await Assert.ThrowsExceptionAsync<ArgumentException>
                 (
@@ -146,7 +146,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
                     (1, true)
                 });
             
-            foreach (var testCase in testCasesGenerator.Generate().Where(x => !x.IsValid))
+            foreach (var testCase in testCasesGenerator.GenerateInvalidCases())
             {
                 await Assert.ThrowsExceptionAsync<ArgumentException>
                 (
@@ -202,7 +202,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
                     (0, true)
                 });
             
-            foreach (var testCase in testCasesGenerator.Generate().Where(x => !x.IsValid))
+            foreach (var testCase in testCasesGenerator.GenerateInvalidCases())
             {
                 await Assert.ThrowsExceptionAsync<ArgumentException>
                 (
@@ -247,7 +247,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
                     (0, true)
                 });
             
-            foreach (var testCase in testCasesGenerator.Generate().Where(x => !x.IsValid))
+            foreach (var testCase in testCasesGenerator.GenerateInvalidCases())
             {
                 await Assert.ThrowsExceptionAsync<ArgumentException>
                 (
@@ -432,7 +432,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             testCasesGenerator
                 .RegisterAddressParameter(address);
             
-            foreach (var testCase in testCasesGenerator.Generate().Where(x => !x.IsValid))
+            foreach (var testCase in testCasesGenerator.GenerateInvalidCases())
             {
                 await Assert.ThrowsExceptionAsync<ArgumentException>
                 (
@@ -487,7 +487,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
                     (0, true)
                 });
             
-            foreach (var testCase in testCasesGenerator.Generate().Where(x => !x.IsValid))
+            foreach (var testCase in testCasesGenerator.GenerateInvalidCases())
             {
                 await Assert.ThrowsExceptionAsync<ArgumentException>
                 (
@@ -523,7 +523,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             testCasesGenerator
                 .RegisterHexStringParameter(signedTxData);
             
-            foreach (var testCase in testCasesGenerator.Generate().Where(x => !x.IsValid))
+            foreach (var testCase in testCasesGenerator.GenerateInvalidCases())
             {
                 Assert.ThrowsException<ArgumentException>
                 (
@@ -588,7 +588,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
                     (0, true)
                 });
             
-            foreach (var testCase in testCasesGenerator.Generate().Where(x => !x.IsValid))
+            foreach (var testCase in testCasesGenerator.GenerateInvalidCases())
             {
                 await Assert.ThrowsExceptionAsync<ArgumentException>
                 (
@@ -622,7 +622,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             testCasesGenerator
                 .RegisterHexStringParameter(signedTxData);
             
-            foreach (var testCase in testCasesGenerator.Generate().Where(x => !x.IsValid))
+            foreach (var testCase in testCasesGenerator.GenerateInvalidCases())
             {
                 Assert.ThrowsException<ArgumentException>
                 (
@@ -665,7 +665,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             testCasesGenerator
                 .RegisterHexStringParameter(signedTxData);
             
-            foreach (var testCase in testCasesGenerator.Generate().Where(x => !x.IsValid))
+            foreach (var testCase in testCasesGenerator.GenerateInvalidCases())
             {
                 await Assert.ThrowsExceptionAsync<ArgumentException>
                 (
@@ -723,7 +723,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             testCasesGenerator
                 .RegisterHexStringParameter(txHash);
             
-            foreach (var testCase in testCasesGenerator.Generate().Where(x => !x.IsValid))
+            foreach (var testCase in testCasesGenerator.GenerateInvalidCases())
             {
                 await Assert.ThrowsExceptionAsync<ArgumentException>
                 (
@@ -776,7 +776,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             testCasesGenerator
                 .RegisterHexStringParameter(txHash);
             
-            foreach (var testCase in testCasesGenerator.Generate().Where(x => !x.IsValid))
+            foreach (var testCase in testCasesGenerator.GenerateInvalidCases())
             {
                 await Assert.ThrowsExceptionAsync<ArgumentException>
                 (
@@ -812,7 +812,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
             testCasesGenerator
                 .RegisterHexStringParameter(signedTxData);
             
-            foreach (var testCase in testCasesGenerator.Generate().Where(x => !x.IsValid))
+            foreach (var testCase in testCasesGenerator.GenerateInvalidCases())
             {
                 await Assert.ThrowsExceptionAsync<ArgumentException>
                 (

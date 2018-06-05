@@ -15,8 +15,6 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
     [UsedImplicitly]
     public class HistoricalTransactionService : IHistoricalTransactionService
     {
-        private const string ShouldBeGreaterThanOne = "Should be greater than one.";
-        
         private readonly IHistoricalTransactionRepository _historicalTransactionRepository;
         private readonly AssetSettings _assetSettings;
 
@@ -46,7 +44,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
 
             if (take <= 1)
             {
-                throw new ArgumentException(ShouldBeGreaterThanOne, nameof(take));
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeGreaterThanOne, nameof(take));
             }
             
             #endregion
@@ -72,7 +70,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Services
 
             if (take <= 1)
             {
-                throw new ArgumentException(ShouldBeGreaterThanOne, nameof(take));
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeGreaterThanOne, nameof(take));
             }
             
             #endregion

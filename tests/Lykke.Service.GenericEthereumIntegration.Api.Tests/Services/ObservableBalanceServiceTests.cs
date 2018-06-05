@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Lykke.Service.GenericEthereumIntegration.Api.Core.Exceptions;
 using Lykke.Service.GenericEthereumIntegration.Api.Services;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Repositories.DTOs;
@@ -30,7 +30,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Tests.Services
             
             var service = serviceBuilder.Build();
 
-            foreach (var testCase in testCasesGenerator.Generate().Where(x => !x.IsValid))
+            foreach (var testCase in testCasesGenerator.GenerateInvalidCases())
             {
                 await Assert.ThrowsExceptionAsync<ArgumentException>
                 (
@@ -87,7 +87,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Tests.Services
             
             var service = serviceBuilder.Build();
 
-            foreach (var testCase in testCasesGenerator.Generate().Where(x => !x.IsValid))
+            foreach (var testCase in testCasesGenerator.GenerateInvalidCases())
             {
                 await Assert.ThrowsExceptionAsync<ArgumentException>
                 (
@@ -149,7 +149,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Tests.Services
             
             var service = serviceBuilder.Build();
 
-            foreach (var testCase in testCasesGenerator.Generate().Where(x => !x.IsValid))
+            foreach (var testCase in testCasesGenerator.GenerateInvalidCases())
             {
                 await Assert.ThrowsExceptionAsync<ArgumentException>
                 (
@@ -186,7 +186,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Tests.Services
         }
 
 
-        
+        [PublicAPI]
         private class ObservableBalanceServiceBuilder
         {
             private bool _deleteIfExistsResult;

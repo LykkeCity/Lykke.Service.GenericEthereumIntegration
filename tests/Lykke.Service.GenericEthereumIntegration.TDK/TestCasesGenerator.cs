@@ -23,7 +23,7 @@ namespace Lykke.Service.GenericEthereumIntegration.TDK
             return this;
         }
 
-        public IEnumerable<TestCase> Generate()
+        public IEnumerable<TestCase> GenerateAllCases()
         {
             var permutationsCount = _parameters
                 .Select(x => x.Value.Length)
@@ -53,6 +53,11 @@ namespace Lykke.Service.GenericEthereumIntegration.TDK
             }
 
             return testCases;
+        }
+
+        public IEnumerable<TestCase> GenerateInvalidCases()
+        {
+            return GenerateAllCases().Where(x => !x.IsValid);
         }
     }
 }

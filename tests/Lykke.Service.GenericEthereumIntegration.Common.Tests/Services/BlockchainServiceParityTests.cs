@@ -7,6 +7,7 @@ using Nethereum.Parity;
 namespace Lykke.Service.GenericEthereumIntegration.Common.Tests.Services
 {
     [TestClass]
+    [TestCategory("Integration")]
     public class BlockchainServiceParityTests : BlockchainServiceTestsBase
     {
         public BlockchainServiceParityTests()

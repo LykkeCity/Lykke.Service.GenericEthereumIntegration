@@ -41,7 +41,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Tests.Services
 
             var service = serviceBuilder.Build();
             
-            foreach (var testCase in testCasesGenerator.Generate().Where(x => !x.IsValid))
+            foreach (var testCase in testCasesGenerator.GenerateInvalidCases())
             {
                 await Assert.ThrowsExceptionAsync<ArgumentException>
                 (
@@ -206,7 +206,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Tests.Services
 
             var service = serviceBuilder.Build();
             
-            foreach (var testCase in testCasesGenerator.Generate().Where(x => !x.IsValid))
+            foreach (var testCase in testCasesGenerator.GenerateInvalidCases())
             {
                 await Assert.ThrowsExceptionAsync<ArgumentException>
                 (
@@ -484,7 +484,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Tests.Services
 
             var service = serviceBuilder.Build();
             
-            foreach (var testCase in testCasesGenerator.Generate().Where(x => !x.IsValid))
+            foreach (var testCase in testCasesGenerator.GenerateInvalidCases())
             {
                 await Assert.ThrowsExceptionAsync<ArgumentException>
                 (

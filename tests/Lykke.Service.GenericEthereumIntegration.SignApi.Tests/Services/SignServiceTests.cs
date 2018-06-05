@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Lykke.Service.GenericEthereumIntegration.SignApi.Services;
 using Lykke.Service.GenericEthereumIntegration.TDK;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -25,7 +24,7 @@ namespace Lykke.Service.GenericEthereumIntegration.SignApi.Tests.Services
 
             var service = new SignService();
             
-            foreach (var testCase in testCasesGenerator.Generate().Where(x => !x.IsValid))
+            foreach (var testCase in testCasesGenerator.GenerateInvalidCases())
             {
                 Assert.ThrowsException<ArgumentException>
                 (
