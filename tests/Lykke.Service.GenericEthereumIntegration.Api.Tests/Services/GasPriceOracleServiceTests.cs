@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Numerics;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Lykke.Service.GenericEthereumIntegration.Api.Core.Repositories.Interfaces;
 using Lykke.Service.GenericEthereumIntegration.Api.Core.Settings.Service;
 using Lykke.Service.GenericEthereumIntegration.Api.Services;
@@ -35,16 +36,14 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Tests.Services
                     (0, false),
                     (1, true)
                 });
-            
-            // ReSharper disable AssignNullToNotNullAttribute
-            var settings = new ApiSettings
+
+            var serviceBuilder = new GasPriceOracleServiceBuilder
             {
-                DefaultMaxGasPrice = MaxGasPrice,
+                DefultMaxGasPrice = MaxGasPrice,
                 DefaultMinGasPrice = MinGasPrice
             };
             
-            var service = new GasPriceOracleService(null, null, settings);
-            // ReSharper restore AssignNullToNotNullAttribute
+            var service = serviceBuilder.Build();
 
             foreach (var testCase in testCasesGenerator.GenerateInvalidCases())
             {
@@ -69,41 +68,97 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Tests.Services
             string estimatedGasPrice,
             string expectedResult)
         {
-            var blockchainService = new Mock<IBlockchainService>();
-            
-            blockchainService
-                .Setup(x => x.EstimateGasPriceAsync(It.IsAny<string>(), It.IsAny<BigInteger>()))
-                .ReturnsAsync(BigInteger.Parse(estimatedGasPrice));
 
-            
-            var gasPriceRepository = new Mock<IGasPriceRepository>();
-            
-            gasPriceRepository
-                .Setup(x => x.GetOrAddAsync(It.IsAny<BigInteger>(), It.IsAny<BigInteger>()))
-                .ReturnsAsync((BigInteger.Parse(MinGasPrice), BigInteger.Parse(MaxGasPrice)));
-
-
-            var settings = new ApiSettings
+            var serviceBuilder = new GasPriceOracleServiceBuilder
             {
-                DefaultMaxGasPrice = MaxGasPrice,
-                DefaultMinGasPrice = MinGasPrice
+                DefultMaxGasPrice = MaxGasPrice,
+                DefaultMinGasPrice = MinGasPrice,
+                EstimateGasPriceResult = BigInteger.Parse(estimatedGasPrice),
+                GetOrAddDefaultGaspriceResult = (BigInteger.Parse(MinGasPrice), BigInteger.Parse(MaxGasPrice))
             };
 
-            var gasPriceOracleService = new GasPriceOracleService
-            (
-                blockchainService.Object,
-                gasPriceRepository.Object,
-                settings
-            );
+            var service = serviceBuilder.Build();
             
-            var actualResult = await gasPriceOracleService.CalculateGasPriceAsync
+            var actualResult = await service.CalculateGasPriceAsync
             (
-                to: "0x83F0726180Cf3964b69f62AC063C5Cb9A66B3bE5",
+                to: TestValues.ValidAddress1,
                 amount: 1000000000
             );
             
-
             Assert.AreEqual(BigInteger.Parse(expectedResult), actualResult);
+        }
+
+
+        [PublicAPI]
+        private class GasPriceOracleServiceBuilder
+        {
+            private BigInteger _estimateGasPriceResult;
+            private (BigInteger, BigInteger) _getOrAddDefaultGaspriceResult;
+            
+            
+            public GasPriceOracleServiceBuilder()
+            {
+                BlockchainService = new Mock<IBlockchainService>();
+                GasPriceRepository = new Mock<IGasPriceRepository>();
+                ApiSettings = new ApiSettings();
+            }
+            
+            
+            public Mock<IBlockchainService> BlockchainService { get; }
+            
+            public Mock<IGasPriceRepository> GasPriceRepository { get; }
+            
+            public ApiSettings ApiSettings { get; }
+
+
+            public string DefultMaxGasPrice
+            {
+                get => ApiSettings.DefaultMaxGasPrice;
+                set => ApiSettings.DefaultMaxGasPrice = value;
+            }
+
+            public string DefaultMinGasPrice
+            {
+                get => ApiSettings.DefaultMinGasPrice;
+                set => ApiSettings.DefaultMinGasPrice = value;
+            }
+
+            public BigInteger EstimateGasPriceResult
+            {
+                get => _estimateGasPriceResult;
+                set
+                {
+                    _estimateGasPriceResult = value;
+                    
+                    BlockchainService
+                        .Setup(x => x.EstimateGasPriceAsync(It.IsAny<string>(), It.IsAny<BigInteger>()))
+                        .ReturnsAsync(value);
+                }
+            }
+            
+            public (BigInteger, BigInteger) GetOrAddDefaultGaspriceResult
+            {
+                get => _getOrAddDefaultGaspriceResult;
+                set
+                {
+                    _getOrAddDefaultGaspriceResult = value;
+
+                    GasPriceRepository
+                        .Setup(x => x.GetOrAddAsync(It.IsAny<BigInteger>(), It.IsAny<BigInteger>()))
+                        .ReturnsAsync(value);
+                }
+            }
+            
+
+            public GasPriceOracleService Build()
+            {
+                return new GasPriceOracleService
+                (
+                    BlockchainService.Object,
+                    GasPriceRepository.Object,
+                    ApiSettings
+                );
+            }
         }
     }
 }
