@@ -76,8 +76,6 @@ namespace Lykke.Service.GenericEthereumIntegration.Api.Tests.Services
             (
                 () => service.GetAsset($"{Guid.NewGuid()}")
             );
-            
-            var actualResult = service.GetAsset(serviceBuilder.Id);
         }
         
         [TestMethod]

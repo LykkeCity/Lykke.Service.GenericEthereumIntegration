@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Numerics;
+using JetBrains.Annotations;
+using Lykke.Service.GenericEthereumIntegration.Common.Core.Domain.Extensions;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Domain.Interfaces;
+using Lykke.Service.GenericEthereumIntegration.Common.Core.Exceptions;
+using Lykke.Service.GenericEthereumIntegration.Common.Core.Utils;
 
 namespace Lykke.Service.GenericEthereumIntegration.Common.Core.Domain
 {
@@ -10,14 +14,14 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Core.Domain
             BigInteger amount,
             DateTime builtOn,
             BigInteger fee,
-            string fromAddress,
+            [NotNull] string fromAddress,
             BigInteger gasPrice,
             bool includeFee,
             BigInteger nonce,
             Guid operationId,
             TransactionState state,
-            string toAddress,
-            string txData)
+            [NotNull] string toAddress,
+            [NotNull] string txData)
         {
             Amount = amount;
             BuiltOn = builtOn;
@@ -40,16 +44,16 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Core.Domain
             DateTime? completedOn,
             string error,
             BigInteger fee,
-            string fromAddress,
+            [NotNull] string fromAddress,
             BigInteger gasPrice,
             bool includeFee,
             BigInteger nonce,
             Guid operationId,
-            string signedTxData,
-            string signedTxHash,
+            [NotNull] string signedTxData,
+            [NotNull] string signedTxHash,
             TransactionState state,
-            string toAddress,
-            string txData)
+            [NotNull] string toAddress,
+            [NotNull] string txData)
         {
             Amount = amount;
             BlockNumber = blockNumber;
@@ -85,6 +89,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Core.Domain
 
         public BigInteger Fee { get; }
 
+        [NotNull]
         public string FromAddress { get; }
 
         public BigInteger GasPrice { get; }
@@ -101,22 +106,82 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Core.Domain
 
         public TransactionState State { get; private set; }
 
+        [NotNull]
         public string ToAddress { get; }
 
+        [NotNull]
         public string TxData { get; }
 
+
+        public bool IsCompleted
+            => State == TransactionState.Completed || State == TransactionState.Failed;
+        
 
         public static TransactionAggregate Build(
             BigInteger amount,
             BigInteger fee,
-            string fromAddress,
+            [NotNull] string fromAddress,
             BigInteger gasPrice,
             bool includeFee,
             BigInteger nonce,
             Guid operationId,
-            string toAddress,
-            string txData)
+            [NotNull] string toAddress,
+            [NotNull] string txData)
         {
+            #region Validation
+
+            if (amount <= 0)
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeGreaterThanZero, nameof(amount));
+            }
+            
+            if (fee <= 0)
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeGreaterThanZero, nameof(fee));
+            }
+
+            if (fromAddress.IsNullOrEmpty())
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldNotBeNullOrEmpty, nameof(fromAddress));
+            }
+            
+            if (!AddressChecksum.Validate(fromAddress))
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeValidAddress, nameof(fromAddress));
+            }
+            
+            if (gasPrice <= 0)
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeGreaterThanZero, nameof(gasPrice));
+            }
+            
+            if (nonce < 0)
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeGreaterOrEqualToZero, nameof(nonce));
+            }
+            
+            if (toAddress.IsNullOrEmpty())
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldNotBeNullOrEmpty, nameof(toAddress));
+            }
+            
+            if (!AddressChecksum.Validate(toAddress))
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeValidAddress, nameof(toAddress));
+            }
+            
+            if (txData.IsNullOrEmpty())
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldNotBeNullOrEmpty, nameof(txData));
+            }
+            
+            if (txData.IsNotHexString())
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeValidHexString, nameof(txData));
+            }
+            
+            #endregion
+            
             return new TransactionAggregate
             (
                 amount: amount,
@@ -134,9 +199,33 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Core.Domain
         }
 
         public void OnBroadcasted(
-            string signedTxData,
-            string signedTxHash)
+            [NotNull] string signedTxData,
+            [NotNull] string signedTxHash)
         {
+            #region Validation
+            
+            if (signedTxData.IsNullOrEmpty())
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldNotBeNullOrEmpty, nameof(signedTxData));
+            }
+            
+            if (signedTxData.IsNotHexString())
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeValidHexString, nameof(signedTxData));
+            }
+            
+            if (signedTxHash.IsNullOrEmpty())
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldNotBeNullOrEmpty, nameof(signedTxHash));
+            }
+            
+            if (signedTxHash.IsNotHexString())
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeValidHexString, nameof(signedTxHash));
+            }
+            
+            #endregion
+            
             SwitchState
             (
                 from: TransactionState.Built,
@@ -151,6 +240,15 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Core.Domain
         public void OnCompleted(
             BigInteger blockNumber)
         {
+            #region Validation
+                
+            if (blockNumber < 0)
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeGreaterOrEqualToZero, nameof(blockNumber));
+            }
+            
+            #endregion
+            
             SwitchState
             (
                 from: TransactionState.InProgress,
@@ -165,6 +263,20 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Core.Domain
             BigInteger blockNumber,
             string error)
         {
+            #region Validation
+                
+            if (blockNumber < 0)
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldBeGreaterOrEqualToZero, nameof(blockNumber));
+            }
+
+            if (error.IsNullOrEmpty())
+            {
+                throw new ArgumentException(CommonExceptionMessages.ShouldNotBeNullOrEmpty, nameof(error));
+            }
+            
+            #endregion
+            
             SwitchState
             (
                 from: TransactionState.InProgress,
@@ -180,14 +292,17 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Core.Domain
             TransactionState from,
             TransactionState to)
         {
-            if (to > State && from == State)
+            if (State != from)
             {
-                State = to;
+                throw new InvalidOperationException($"Transaction is not in ${from.ToString()} state.");
             }
-            else
+
+            if (!State.IsAllowedToSwitch(to))
             {
                 throw new InvalidOperationException($"Transaction state can not be switched from {State.ToString()} to {to.ToString()}");
             }
+            
+            State = to;
         }
     }
 }

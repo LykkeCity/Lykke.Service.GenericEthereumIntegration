@@ -40,6 +40,9 @@ namespace Lykke.Service.GenericEthereumIntegration.Common.Core.Domain.Interfaces
         string TxData { get; }
 
         
+        bool IsCompleted { get; }
+        
+        
         void OnBroadcasted(string signedTxData, string signedTxHash);
 
         void OnCompleted(BigInteger blockNumber);

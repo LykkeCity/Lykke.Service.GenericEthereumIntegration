@@ -14,7 +14,6 @@ namespace Lykke.Service.GenericEthereumIntegration.Worker.Actors.Roles
         private readonly ITransactionRepository _transactionRepository;
 
 
-
         public OperationMonitorRole(
             IOperationMonitorTaskRepository operationMonitorTaskRepository,
             ITransactionRepository transactionRepository)
@@ -28,7 +27,7 @@ namespace Lykke.Service.GenericEthereumIntegration.Worker.Actors.Roles
         {
             var transactionAggregate = await _transactionRepository.TryGetAsync(message.TransactionHash);
 
-            if (transactionAggregate != null)
+            if (transactionAggregate?.IsCompleted == false)
             {
                 if (!message.TransactionFailed)
                 {

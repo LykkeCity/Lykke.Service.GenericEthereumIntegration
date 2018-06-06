@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
-using Lykke.Service.GenericEthereumIntegration.Api.Models;
 using Lykke.Service.GenericEthereumIntegration.Api.Services;
-using Lykke.Service.GenericEthereumIntegration.Common.Core.Services.Extensions;
 using Lykke.Service.GenericEthereumIntegration.Common.Core.Services.Interfaces;
 using Lykke.Service.GenericEthereumIntegration.TDK;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

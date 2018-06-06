@@ -12,8 +12,8 @@ namespace Lykke.Service.GenericEthereumIntegration.TDK
         {
             _parameters = new Dictionary<string, (object Value, bool IsValid)[]>();
         }
-        
-        
+
+
         public TestCasesGenerator RegisterParameter<T>(string name, IEnumerable<(T Value, bool IsValid)> values)
         {
             _parameters[name] = values

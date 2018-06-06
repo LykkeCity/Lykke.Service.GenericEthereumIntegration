@@ -7,6 +7,7 @@
   <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" Version="11.1.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.2" />
+    <PackageReference Include="Moq" Version="4.8.2" />
     <PackageReference Include="MSTest.TestAdapter" Version="1.3.1" />
     <PackageReference Include="MSTest.TestFramework" Version="1.3.1" />
   </ItemGroup>
@@ -14,5 +15,7 @@
     <ProjectReference Include="..\..\src\Lykke.Service.GenericEthereumIntegration.Worker.Core\Lykke.Service.GenericEthereumIntegration.Worker.Core.csproj" />
     <ProjectReference Include="..\..\src\Lykke.Service.GenericEthereumIntegration.Worker.Repositories\Lykke.Service.GenericEthereumIntegration.Worker.Repositories.csproj" />
     <ProjectReference Include="..\..\src\Lykke.Service.GenericEthereumIntegration.Worker.Services\Lykke.Service.GenericEthereumIntegration.Worker.Services.csproj" />
+    <ProjectReference Include="..\..\src\Lykke.Service.GenericEthereumIntegration.Worker\Lykke.Service.GenericEthereumIntegration.Worker.csproj" />
+    <ProjectReference Include="..\Lykke.Service.GenericEthereumIntegration.TDK\Lykke.Service.GenericEthereumIntegration.TDK.csproj" />
   </ItemGroup>
 </Project>
